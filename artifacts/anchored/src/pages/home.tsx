@@ -68,7 +68,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground mb-1">Yours Only</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">Your data stays on your device. Private by design.</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">Your private account keeps every proof secure in the cloud — visible only to you.</p>
             </div>
           </div>
 
