@@ -15,6 +15,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<AuthResult>;
   resetPassword: (email: string) => Promise<AuthResult>;
   updatePassword: (password: string) => Promise<AuthResult>;
+  verifyPassword: (password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
@@ -81,6 +82,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message };
   };
 
+  const verifyPassword = async (password: string): Promise<AuthResult> => {
+    const email = user?.email;
+    if (!email) {
+      return { error: "No email is associated with this account." };
+    }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error?.message };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -96,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signInWithGoogle,
         resetPassword,
         updatePassword,
+        verifyPassword,
         signOut,
       }}
     >

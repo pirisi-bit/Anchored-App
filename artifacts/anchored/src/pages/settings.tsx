@@ -22,8 +22,9 @@ import { Plus, Trash2, User, ChevronRight, LogOut, KeyRound } from "lucide-react
 
 export default function SettingsPage() {
   const { clearAll } = useAnchors();
-  const { user, signOut, updatePassword } = useAuth();
+  const { user, signOut, updatePassword, verifyPassword } = useAuth();
 
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -44,8 +45,8 @@ export default function SettingsPage() {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!password || !confirm) {
-      toast.error("Please enter and confirm your new password.");
+    if (!currentPassword || !password || !confirm) {
+      toast.error("Please fill in all password fields.");
       return;
     }
     if (password.length < 6) {
@@ -58,11 +59,17 @@ export default function SettingsPage() {
     }
     setSubmitting(true);
     try {
+      const verifyResult = await verifyPassword(currentPassword);
+      if (verifyResult.error) {
+        toast.error("Your current password is incorrect.");
+        return;
+      }
       const { error } = await updatePassword(password);
       if (error) {
         toast.error(error);
       } else {
         toast.success("Password updated.");
+        setCurrentPassword("");
         setPassword("");
         setConfirm("");
       }
@@ -123,6 +130,19 @@ export default function SettingsPage() {
             </div>
             {hasPasswordLogin ? (
               <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="settings-current-password">Current password</Label>
+                  <Input
+                    id="settings-current-password"
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="h-12 rounded-2xl"
+                    data-testid="input-current-password"
+                  />
+                </div>
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="settings-new-password">New password</Label>
                   <Input
