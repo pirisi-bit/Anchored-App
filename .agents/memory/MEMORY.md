@@ -1,3 +1,4 @@
-- [Upload-then-link flows](upload-link-flows.md) — block sheet dismissal mid-upload (or capture target id at start) or the file uploads but the record never links.
-- [Supabase keys & which Postgres is which](supabase-keys-and-db.md) — sb_publishable_/anon key is browser-safe (VITE_/EXPO_PUBLIC_ env, not a secret); web+mobile share ONE Supabase project; the repl's Postgres is Helium, NOT Supabase, so migrations run in the Supabase dashboard.
-- [Expo scaffold useColors](expo-scaffold-usecolors.md) — adding a non-palette top-level key (e.g. radius) to constants/colors.ts breaks the scaffold's generic useColors cast; index colors.light/.dark directly.
+- [Finding Expo Go-compatible package versions](expo-compatible-versions.md) — read expo's bundledNativeModules.json for the right native-module version; don't run expo install.
+- [Upload link flows](upload-link-flows.md) — block sheet dismissal mid-upload or capture the target id, else uploads orphan.
+- [Expo scaffold useColors vs custom tokens](expo-scaffold-usecolors.md) — non-palette top-level keys in constants/colors.ts break the useColors cast.
+- [Supabase keys & which Postgres is which](supabase-keys-and-db.md) — browser-safe key handling; the repl's Postgres is NOT the Supabase DB.

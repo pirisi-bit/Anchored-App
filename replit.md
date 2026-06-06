@@ -31,6 +31,10 @@ _Replace the heading above with the project's name, and this line with one sente
   - `src/pages/reset-password.tsx` — set-new-password screen reached from the recovery email link; waits for the `PASSWORD_RECOVERY` session before showing the form.
   - `supabase/migrations/0001_init.sql` — source-of-truth DB schema + RLS (applied manually in the Supabase dashboard).
 - `artifacts/api-server` — handles receipt/photo file uploads (`POST /api/receipts/upload`).
+- `artifacts/mobile` — the Anchored native Expo app (mirrors the web design, same Supabase backend).
+  - `lib/notifications.ts` — expo-notifications handler + daily-reminder scheduling helpers (web-guarded; native only).
+  - `lib/reminders-context.tsx` — `RemindersProvider` / `useReminders` (persisted enable + time in AsyncStorage, permission request, reschedules the daily local reminder with today's unverified count).
+  - Reminder UI lives in `app/(tabs)/settings.tsx` (toggle + time picker).
 
 ## Architecture decisions
 

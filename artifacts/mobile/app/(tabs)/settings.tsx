@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   View,
   Text,
@@ -6,13 +7,24 @@ import {
   Pressable,
   Platform,
   Alert,
+  Switch,
 } from "react-native";
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
 import { useAuth } from "@/lib/auth-context";
+import { useReminders } from "@/lib/reminders-context";
+
+function formatTime(hour: number, minute: number): string {
+  const period = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+  return `${displayHour}:${String(minute).padStart(2, "0")} ${period}`;
+}
 
 function SectionLabel({ children }: { children: string }) {
   const colors = useColors();
@@ -29,8 +41,49 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { clearAll } = useAnchors();
   const { user, signOut } = useAuth();
+  const {
+    enabled,
+    hour,
+    minute,
+    busy,
+    supported,
+    setEnabled,
+    setTime,
+  } = useReminders();
+  const [showPicker, setShowPicker] = useState(false);
 
   const topPad = insets.top + (Platform.OS === "web" ? 67 : 0) + 8;
+
+  const handleToggleReminders = async (next: boolean) => {
+    if (!supported) {
+      Alert.alert(
+        "Not available here",
+        "Daily reminders work in the Anchored mobile app.",
+      );
+      return;
+    }
+    const result = await setEnabled(next);
+    if (next && !result) {
+      Alert.alert(
+        "Notifications are off",
+        "Enable notifications for Anchored in your device Settings to get daily reminders.",
+      );
+    }
+  };
+
+  const handleTimeChange = (event: DateTimePickerEvent, date?: Date) => {
+    if (Platform.OS !== "ios") {
+      setShowPicker(false);
+    }
+    if (event.type === "dismissed" || !date) return;
+    setTime(date.getHours(), date.getMinutes());
+  };
+
+  const pickerValue = (() => {
+    const d = new Date();
+    d.setHours(hour, minute, 0, 0);
+    return d;
+  })();
 
   const handleClearAll = () => {
     Alert.alert(
@@ -120,6 +173,79 @@ export default function SettingsScreen() {
           </View>
           <Feather name="chevron-right" size={20} color={colors.mutedForeground} />
         </Pressable>
+
+        <SectionLabel>REMINDERS</SectionLabel>
+        <View
+          style={[
+            styles.reminderCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <View style={styles.reminderRow}>
+            <View style={styles.rowLeft}>
+              <View style={[styles.rowIcon, { backgroundColor: "rgba(59,130,246,0.1)" }]}>
+                <Feather name="bell" size={20} color={colors.primary} />
+              </View>
+              <View style={styles.reminderTextWrap}>
+                <Text style={[styles.rowText, { color: colors.foreground }]}>
+                  Daily reminder
+                </Text>
+                <Text
+                  style={[styles.reminderSub, { color: colors.mutedForeground }]}
+                >
+                  Nudge me to verify my routines
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={enabled}
+              onValueChange={handleToggleReminders}
+              disabled={busy || !supported}
+              trackColor={{ false: colors.secondary, true: colors.primary }}
+              thumbColor="#FFFFFF"
+              testID="switch-daily-reminder"
+            />
+          </View>
+
+          {enabled && supported && (
+            <Pressable
+              onPress={() => setShowPicker((s) => !s)}
+              style={({ pressed }) => [
+                styles.reminderTimeRow,
+                { borderColor: colors.border, opacity: pressed ? 0.9 : 1 },
+              ]}
+              testID="btn-reminder-time"
+            >
+              <Text style={[styles.rowText, { color: colors.foreground }]}>
+                Reminder time
+              </Text>
+              <View style={styles.reminderTimeRight}>
+                <Text style={[styles.reminderTimeValue, { color: colors.primary }]}>
+                  {formatTime(hour, minute)}
+                </Text>
+                <Feather name="clock" size={18} color={colors.mutedForeground} />
+              </View>
+            </Pressable>
+          )}
+
+          {enabled && supported && showPicker && (
+            <View style={styles.pickerWrap}>
+              <DateTimePicker
+                value={pickerValue}
+                mode="time"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={handleTimeChange}
+                themeVariant={colors.background === "#111111" ? "dark" : "light"}
+              />
+            </View>
+          )}
+
+          {!supported && (
+            <Text style={[styles.reminderSub, { color: colors.mutedForeground, marginTop: 12 }]}>
+              Reminders are available in the Anchored mobile app.
+            </Text>
+          )}
+        </View>
 
         <SectionLabel>DATA</SectionLabel>
         <Pressable
@@ -243,6 +369,45 @@ const styles = StyleSheet.create({
   rowText: {
     fontSize: 15,
     fontFamily: "Inter_700Bold",
+  },
+  reminderCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+    marginBottom: 20,
+  },
+  reminderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  reminderTextWrap: {
+    flexShrink: 1,
+  },
+  reminderSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    marginTop: 2,
+  },
+  reminderTimeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderTopWidth: 1,
+    marginTop: 14,
+    paddingTop: 14,
+  },
+  reminderTimeRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  reminderTimeValue: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+  },
+  pickerWrap: {
+    marginTop: 8,
   },
   footer: {
     alignItems: "center",

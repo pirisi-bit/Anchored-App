@@ -18,6 +18,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { AnchorsProvider } from "@/lib/anchors-context";
+import { RemindersProvider } from "@/lib/reminders-context";
 import { useColors } from "@/hooks/useColors";
 
 SplashScreen.preventAutoHideAsync();
@@ -98,7 +99,9 @@ export default function RootLayout() {
             <KeyboardProvider>
               <AuthProvider>
                 <AnchorsProvider>
-                  <RootLayoutNav />
+                  <RemindersProvider>
+                    <RootLayoutNav />
+                  </RemindersProvider>
                 </AnchorsProvider>
               </AuthProvider>
             </KeyboardProvider>
