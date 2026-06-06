@@ -1,8 +1,13 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "2GusrlP4rofJTYTV7sA6f"
 uri = "file://artifacts/mobile/assets/images/icon.png"
 type = "image"
 title = "anchored app icon"
+
+[[outputs]]
+id = "0CKRn0F5aJMu-NwKsBNnR"
+uri = "file://artifacts/mobile/store/store-listing.md"
+type = "text"
+title = "Anchored — App Store & Play Store Listing Content"

@@ -17,12 +17,12 @@ export default function Home() {
       <main className="flex-1 flex flex-col items-center justify-center pt-16 pb-24 px-6 relative z-0">
         <div className="max-w-md mx-auto text-center space-y-8">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight text-foreground animate-hero-title">
-            Remember<br />
-            <span className="text-primary italic font-serif">Everything.</span>
+            Everything's<br />
+            <span className="text-primary italic font-serif">Under Control.</span>
           </h1>
           
           <p className="text-lg text-muted-foreground leading-relaxed animate-hero-subtitle">
-            The peaceful way to document your reality. Create proof that important daily actions were completed.
+            The calm way to know your daily routines are truly done. Capture quiet proof, and let the second-guessing go.
           </p>
 
           <div className="pt-4 animate-hero-cta w-full">
