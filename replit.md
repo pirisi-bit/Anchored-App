@@ -27,7 +27,8 @@ _Replace the heading above with the project's name, and this line with one sente
   - `src/lib/auth-context.tsx` — `AuthProvider` / `useAuth` (email + Google auth, session).
   - `src/lib/anchors-context.tsx` — `AnchorsProvider` / `useAnchors` (async, user-scoped anchors & proofs).
   - `src/lib/storage.ts` — Supabase data access for `anchors` / `proofs` (camelCase ↔ snake_case mapping).
-  - `src/pages/login.tsx` — auth screen; route protection lives in `src/App.tsx`.
+  - `src/pages/login.tsx` — auth screen (incl. "Forgot password?"); route protection lives in `src/App.tsx`.
+  - `src/pages/reset-password.tsx` — set-new-password screen reached from the recovery email link; waits for the `PASSWORD_RECOVERY` session before showing the form.
   - `supabase/migrations/0001_init.sql` — source-of-truth DB schema + RLS (applied manually in the Supabase dashboard).
 - `artifacts/api-server` — handles receipt/photo file uploads (`POST /api/receipts/upload`).
 

@@ -10,7 +10,8 @@ import { toast } from "sonner";
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const { user, loading, signUpWithEmail, signInWithEmail, signInWithGoogle } = useAuth();
+  const { user, loading, signUpWithEmail, signInWithEmail, signInWithGoogle, resetPassword } =
+    useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,6 +58,24 @@ export default function Login() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast.error("Enter your email above, then tap “Forgot password?” again.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await resetPassword(email);
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Password reset link sent. Check your email.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center max-w-md mx-auto px-6 py-12">
       <div className="flex flex-col items-center mb-8">
@@ -88,7 +107,20 @@ export default function Login() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            {mode === "signin" && (
+              <button
+                type="button"
+                className="text-sm text-primary font-semibold hover:underline"
+                onClick={handleForgotPassword}
+                disabled={submitting}
+                data-testid="btn-forgot-password"
+              >
+                Forgot password?
+              </button>
+            )}
+          </div>
           <Input
             id="password"
             type="password"

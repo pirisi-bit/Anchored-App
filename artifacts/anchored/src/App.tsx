@@ -11,6 +11,7 @@ import { BottomNav } from "@/components/BottomNav";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
+import ResetPassword from "@/pages/reset-password";
 import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
 import AnchorsPage from "@/pages/anchors";
@@ -45,13 +46,18 @@ function ProtectedRoute({ component: Component }: { component: ComponentType }) 
 
 function Router() {
   const [location] = useLocation();
-  const hideNav = location === "/" || location === "/onboarding" || location === "/login";
+  const hideNav =
+    location === "/" ||
+    location === "/onboarding" ||
+    location === "/login" ||
+    location === "/reset-password";
 
   return (
     <>
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/login" component={Login} />
+        <Route path="/reset-password" component={ResetPassword} />
         <Route path="/onboarding">
           <ProtectedRoute component={Onboarding} />
         </Route>

@@ -13,13 +13,15 @@ interface AuthContextType {
   signUpWithEmail: (email: string, password: string) => Promise<AuthResult>;
   signInWithEmail: (email: string, password: string) => Promise<AuthResult>;
   signInWithGoogle: () => Promise<AuthResult>;
+  resetPassword: (email: string) => Promise<AuthResult>;
+  updatePassword: (password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function redirectUrl() {
-  return `${window.location.origin}${import.meta.env.BASE_URL}`;
+function redirectUrl(path = "") {
+  return `${window.location.origin}${import.meta.env.BASE_URL}${path}`;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -67,13 +69,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message };
   };
 
+  const resetPassword = async (email: string): Promise<AuthResult> => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl("reset-password"),
+    });
+    return { error: error?.message };
+  };
+
+  const updatePassword = async (password: string): Promise<AuthResult> => {
+    const { error } = await supabase.auth.updateUser({ password });
+    return { error: error?.message };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, signUpWithEmail, signInWithEmail, signInWithGoogle, signOut }}
+      value={{
+        user,
+        session,
+        loading,
+        signUpWithEmail,
+        signInWithEmail,
+        signInWithGoogle,
+        resetPassword,
+        updatePassword,
+        signOut,
+      }}
     >
       {children}
     </AuthContext.Provider>
