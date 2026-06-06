@@ -54,16 +54,19 @@ export default function Dashboard() {
             <button className="text-primary font-medium underline" onClick={() => setLocation("/onboarding")}>Add some anchors</button>
           </div>
         ) : (
-          activeAnchors.map(anchor => (
-            <AnchorCard
-              key={anchor.id}
-              anchor={anchor}
-              proof={getTodayProof(anchor.id)}
-              onSelfConfirm={() => handleSelfConfirm(anchor.id)}
-              onPhotoClick={() => setActiveAnchorForPhoto(anchor)}
-              onViewProof={() => setLocation("/proof")}
-            />
-          ))
+          activeAnchors.map(anchor => {
+            const todayProof = getTodayProof(anchor.id);
+            return (
+              <AnchorCard
+                key={anchor.id}
+                anchor={anchor}
+                proof={todayProof}
+                onSelfConfirm={() => handleSelfConfirm(anchor.id)}
+                onPhotoClick={() => setActiveAnchorForPhoto(anchor)}
+                onViewProof={() => todayProof && setLocation(`/proof/${todayProof.id}`)}
+              />
+            );
+          })
         )}
       </div>
 

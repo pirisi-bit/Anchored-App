@@ -11,6 +11,7 @@ import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
 import AnchorsPage from "@/pages/anchors";
 import ProofPage from "@/pages/proof";
+import ProofReview from "@/pages/proof-review";
 import SettingsPage from "@/pages/settings";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ function Router() {
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/anchors" component={AnchorsPage} />
         <Route path="/proof" component={ProofPage} />
+        <Route path="/proof/:id" component={ProofReview} />
         <Route path="/settings" component={SettingsPage} />
         <Route component={NotFound} />
       </Switch>

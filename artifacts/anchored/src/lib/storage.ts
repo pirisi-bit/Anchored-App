@@ -19,6 +19,8 @@ export interface Proof {
   status: ProofStatus;
   verificationMethod: VerificationMethod;
   photoUrl?: string;
+  receiptUrl?: string;
+  voiceUrl?: string;
   createdAt: string;
 }
 

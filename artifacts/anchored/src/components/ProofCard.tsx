@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { useLocation } from "wouter";
 import { Anchor, Proof } from "@/lib/storage";
 import { StatusBadge } from "./StatusBadge";
 import { getCategoryColor } from "./AnchorCard";
@@ -10,10 +11,16 @@ interface ProofCardProps {
 }
 
 export function ProofCard({ proof, anchor }: ProofCardProps) {
+  const [, setLocation] = useLocation();
   if (!anchor) return null;
 
   return (
-    <div className="bg-card rounded-2xl p-4 shadow-sm border flex flex-col gap-3" data-testid={`card-proof-${proof.id}`}>
+    <button
+      type="button"
+      onClick={() => setLocation(`/proof/${proof.id}`)}
+      className="w-full text-left bg-card rounded-2xl p-4 shadow-sm border flex flex-col gap-3 transition-transform active:scale-[0.98] hover:shadow-md"
+      data-testid={`card-proof-${proof.id}`}
+    >
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-2">
           <div className={cn("w-2 h-2 rounded-full", getCategoryColor(anchor.category))} />
@@ -30,6 +37,6 @@ export function ProofCard({ proof, anchor }: ProofCardProps) {
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 }
