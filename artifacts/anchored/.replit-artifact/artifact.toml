@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Anchored"
+version = "1.0.0"
+id = "artifacts/anchored"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22964
+
+[services.development]
+run = "pnpm --filter @workspace/anchored run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/anchored", "run", "build" ]
+publicDir = "artifacts/anchored/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22964"
+BASE_PATH = "/"
