@@ -30,8 +30,8 @@ _Replace the heading above with the project's name, and this line with one sente
   - `src/pages/login.tsx` — auth screen (incl. "Forgot password?"); route protection lives in `src/App.tsx`.
   - `src/pages/reset-password.tsx` — set-new-password screen reached from the recovery email link; waits for the `PASSWORD_RECOVERY` session before showing the form.
   - `supabase/migrations/0001_init.sql` — source-of-truth DB schema + RLS (applied manually in the Supabase dashboard).
-- `artifacts/api-server` — handles receipt/photo file uploads (`POST /api/receipts/upload`).
-- `artifacts/mobile` — the Anchored native Expo app (mirrors the web design, same Supabase backend).
+- `artifacts/mobile` — the Anchored native Expo app (mirrors the web design, same Supabase backend; expo-router).
+  - `app.json` — static Expo config: iOS `bundleIdentifier`/`buildNumber`, Android `package`/`versionCode`, camera + photo-library permission strings (used by `components/CaptureSheet.tsx`). Keep config static here — never add `app.config.ts/js`.
   - `lib/notifications.ts` — expo-notifications handler + daily-reminder scheduling helpers (web-guarded; native only).
   - `lib/reminders-context.tsx` — `RemindersProvider` / `useReminders` (persisted enable + time in AsyncStorage, permission request, reschedules the daily local reminder with today's unverified count).
   - Reminder UI lives in `app/(tabs)/settings.tsx` (toggle + time picker).
@@ -54,7 +54,7 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Mobile store publishing: do **not** use EAS or create `eas.json` on Replit. iOS ships via Replit's **Expo Launch** (Publish button; `suggestDeploy()` works only from the main agent, not task-agents). Android/Play Store publishing is **not currently supported** on Replit. "Get it in the stores" work means finalizing `app.json` readiness, not EAS.
 
 ## Pointers
 
