@@ -19,6 +19,7 @@ interface AnchorsContextType {
   updateAnchorState: (anchor: Anchor) => void;
   selfConfirm: (anchorId: string) => void;
   addPhotoProof: (anchorId: string, photoUrl: string) => void;
+  addReceiptProof: (anchorId: string, receiptUrl: string) => void;
   getTodayProof: (anchorId: string) => Proof | undefined;
   refresh: () => void;
   clearAll: () => void;
@@ -81,6 +82,19 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
     refresh();
   };
 
+  const addReceiptProof = (anchorId: string, receiptUrl: string) => {
+    saveProof({
+      id: crypto.randomUUID(),
+      anchorId,
+      dateKey: todayKey,
+      status: "Verified",
+      verificationMethod: "Receipt",
+      receiptUrl,
+      createdAt: new Date().toISOString()
+    });
+    refresh();
+  };
+
   const getTodayProof = (anchorId: string) => {
     return proofs.find(p => p.anchorId === anchorId && p.dateKey === todayKey);
   };
@@ -99,6 +113,7 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
       updateAnchorState,
       selfConfirm,
       addPhotoProof,
+      addReceiptProof,
       getTodayProof,
       refresh,
       clearAll

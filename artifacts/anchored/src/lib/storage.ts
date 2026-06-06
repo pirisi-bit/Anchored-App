@@ -1,4 +1,4 @@
-export type VerificationMethod = "Self-confirm" | "Photo";
+export type VerificationMethod = "Self-confirm" | "Photo" | "Receipt";
 export type ProofStatus = "Unverified" | "Self-confirmed" | "Verified";
 
 export type Category = "Home Safety" | "Medication" | "Bills & Receipts" | "Personal Care" | "Pet Care";

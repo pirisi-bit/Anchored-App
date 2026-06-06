@@ -4,8 +4,12 @@ import { useAnchors } from "@/lib/anchors-context";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getCategoryColor } from "@/components/AnchorCard";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Camera, Mic, ShieldAlert, Receipt as ReceiptIcon } from "lucide-react";
+import { ChevronLeft, Camera, Mic, ShieldAlert, Receipt as ReceiptIcon, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+function isPdfUrl(url: string): boolean {
+  return url.split("?")[0].toLowerCase().endsWith(".pdf");
+}
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -105,9 +109,35 @@ export default function ProofReview() {
                 <ReceiptIcon className="w-4 h-4 text-muted-foreground" />
                 Receipt
               </h2>
-              <div className="rounded-2xl overflow-hidden border shadow-sm bg-muted">
-                <img src={proof.receiptUrl} alt="Receipt" className="w-full h-auto object-cover" />
-              </div>
+              {isPdfUrl(proof.receiptUrl) ? (
+                <div className="rounded-2xl overflow-hidden border shadow-sm bg-card">
+                  <object
+                    data={proof.receiptUrl}
+                    type="application/pdf"
+                    className="w-full h-[420px] bg-muted"
+                    aria-label="Receipt PDF preview"
+                  >
+                    <div className="flex flex-col items-center gap-3 p-8 text-center">
+                      <FileText className="w-10 h-10 text-brand-orange" />
+                      <p className="text-sm text-muted-foreground">PDF preview isn't supported here.</p>
+                    </div>
+                  </object>
+                  <a
+                    href={proof.receiptUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 border-t py-3 text-sm font-medium text-primary hover:underline"
+                    data-testid="link-open-receipt-pdf"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Open PDF
+                  </a>
+                </div>
+              ) : (
+                <a href={proof.receiptUrl} target="_blank" rel="noopener noreferrer" className="block rounded-2xl overflow-hidden border shadow-sm bg-muted">
+                  <img src={proof.receiptUrl} alt="Receipt" className="w-full h-auto object-cover" />
+                </a>
+              )}
             </section>
           )}
 

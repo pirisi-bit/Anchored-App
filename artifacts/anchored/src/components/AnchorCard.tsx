@@ -1,7 +1,7 @@
 import { Anchor, Proof, Category } from "@/lib/storage";
 import { StatusBadge } from "./StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Camera } from "lucide-react";
+import { Camera, Check, Receipt } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AnchorCardProps {
@@ -9,6 +9,7 @@ interface AnchorCardProps {
   proof?: Proof;
   onSelfConfirm: () => void;
   onPhotoClick: () => void;
+  onReceiptClick: () => void;
   onViewProof?: () => void;
 }
 
@@ -23,7 +24,7 @@ export function getCategoryColor(category: Category) {
   }
 }
 
-export function AnchorCard({ anchor, proof, onSelfConfirm, onPhotoClick, onViewProof }: AnchorCardProps) {
+export function AnchorCard({ anchor, proof, onSelfConfirm, onPhotoClick, onReceiptClick, onViewProof }: AnchorCardProps) {
   const isDone = !!proof;
 
   return (
@@ -41,26 +42,34 @@ export function AnchorCard({ anchor, proof, onSelfConfirm, onPhotoClick, onViewP
         <StatusBadge status={proof ? proof.status : "Unverified"} />
       </div>
 
-      {/* Bottom row: action buttons — full width so nothing gets clipped */}
+      {/* Bottom row: action buttons — equal width, icon over label so nothing gets clipped */}
       {!isDone && (
-        <div className="flex gap-2 pt-1">
+        <div className="grid grid-cols-3 gap-2 pt-1">
           <Button
             variant="outline"
-            size="sm"
-            className="flex-1 h-10 rounded-full text-sm font-medium"
+            className="h-auto flex-col gap-1 rounded-xl py-2.5 text-xs font-medium"
             onClick={onSelfConfirm}
             data-testid={`btn-self-confirm-${anchor.id}`}
           >
-            Self-confirm
+            <Check className="w-4 h-4" />
+            Confirm
           </Button>
           <Button
-            size="sm"
-            className="flex-1 h-10 rounded-full text-sm font-medium gap-1.5"
+            variant="outline"
+            className="h-auto flex-col gap-1 rounded-xl py-2.5 text-xs font-medium"
             onClick={onPhotoClick}
             data-testid={`btn-photo-${anchor.id}`}
           >
             <Camera className="w-4 h-4" />
             Photo
+          </Button>
+          <Button
+            className="h-auto flex-col gap-1 rounded-xl py-2.5 text-xs font-medium"
+            onClick={onReceiptClick}
+            data-testid={`btn-receipt-${anchor.id}`}
+          >
+            <Receipt className="w-4 h-4" />
+            Receipt
           </Button>
         </div>
       )}

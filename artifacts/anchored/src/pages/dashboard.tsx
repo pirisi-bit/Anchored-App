@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { useAnchors } from "@/lib/anchors-context";
 import { AnchorCard } from "@/components/AnchorCard";
 import { PhotoSheet } from "@/components/PhotoSheet";
+import { ReceiptSheet } from "@/components/ReceiptSheet";
 import { format } from "date-fns";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
@@ -10,8 +11,9 @@ import { Anchor } from "@/lib/storage";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
-  const { anchors, proofs, todayKey, selfConfirm, addPhotoProof, getTodayProof } = useAnchors();
+  const { anchors, proofs, todayKey, selfConfirm, addPhotoProof, addReceiptProof, getTodayProof } = useAnchors();
   const [activeAnchorForPhoto, setActiveAnchorForPhoto] = useState<Anchor | null>(null);
+  const [activeAnchorForReceipt, setActiveAnchorForReceipt] = useState<Anchor | null>(null);
 
   const activeAnchors = anchors.filter(a => a.active);
   const todayProofs = proofs.filter(p => p.dateKey === todayKey);
@@ -29,6 +31,14 @@ export default function Dashboard() {
       addPhotoProof(activeAnchorForPhoto.id, photoUrl);
       setActiveAnchorForPhoto(null);
       toast.success("Proof saved. ✓");
+    }
+  };
+
+  const handleReceiptSave = (receiptUrl: string) => {
+    if (activeAnchorForReceipt) {
+      addReceiptProof(activeAnchorForReceipt.id, receiptUrl);
+      setActiveAnchorForReceipt(null);
+      toast.success("Receipt saved. ✓");
     }
   };
 
@@ -63,6 +73,7 @@ export default function Dashboard() {
                 proof={todayProof}
                 onSelfConfirm={() => handleSelfConfirm(anchor.id)}
                 onPhotoClick={() => setActiveAnchorForPhoto(anchor)}
+                onReceiptClick={() => setActiveAnchorForReceipt(anchor)}
                 onViewProof={() => todayProof && setLocation(`/proof/${todayProof.id}`)}
               />
             );
@@ -75,6 +86,13 @@ export default function Dashboard() {
         onOpenChange={(open) => !open && setActiveAnchorForPhoto(null)}
         anchorName={activeAnchorForPhoto?.name || ""}
         onSave={handlePhotoSave}
+      />
+
+      <ReceiptSheet
+        open={!!activeAnchorForReceipt}
+        onOpenChange={(open) => !open && setActiveAnchorForReceipt(null)}
+        anchorName={activeAnchorForReceipt?.name || ""}
+        onSave={handleReceiptSave}
       />
     </div>
   );
