@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +16,9 @@ import SettingsPage from "@/pages/settings";
 const queryClient = new QueryClient();
 
 function Router() {
+  const [location] = useLocation();
+  const hideNav = location === "/" || location === "/onboarding";
+
   return (
     <>
       <Switch>
@@ -27,14 +30,7 @@ function Router() {
         <Route path="/settings" component={SettingsPage} />
         <Route component={NotFound} />
       </Switch>
-      <Route path="/:path*">
-        {params => {
-          if (params.path !== "" && params.path !== "onboarding") {
-            return <BottomNav />;
-          }
-          return null;
-        }}
-      </Route>
+      {!hideNav && <BottomNav />}
     </>
   );
 }

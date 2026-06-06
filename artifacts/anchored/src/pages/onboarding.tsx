@@ -49,7 +49,7 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto relative pb-24">
+    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto relative pb-40">
       <div className="px-4 pt-12 pb-6">
         <h1 className="text-3xl font-extrabold tracking-tight mb-2">What do you want to track?</h1>
         <p className="text-muted-foreground">Select the habits and routines you want to build proof for.</p>
@@ -68,7 +68,10 @@ export default function Onboarding() {
         ))}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent pt-12">
+      <div
+        className="fixed bottom-0 left-0 right-0 px-4 pt-12 bg-gradient-to-t from-background via-background to-transparent"
+        style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+      >
         <div className="max-w-md mx-auto">
           <Button 
             className="w-full rounded-full h-14 text-lg font-bold shadow-lg" 
