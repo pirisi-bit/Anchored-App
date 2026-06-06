@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { useAnchors } from "@/lib/anchors-context";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   AlertDialog,
@@ -15,11 +18,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Trash2, User, ChevronRight, LogOut } from "lucide-react";
+import { Plus, Trash2, User, ChevronRight, LogOut, KeyRound } from "lucide-react";
 
 export default function SettingsPage() {
   const { clearAll } = useAnchors();
-  const { user, signOut } = useAuth();
+  const { user, signOut, updatePassword } = useAuth();
+
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const hasPasswordLogin =
+    user?.identities?.some((i) => i.provider === "email") ??
+    (user?.app_metadata?.providers as string[] | undefined)?.includes("email") ??
+    false;
 
   const handleClearAll = async () => {
     try {
@@ -27,6 +39,35 @@ export default function SettingsPage() {
       toast.success("All data cleared.");
     } catch (e) {
       toast.error("Could not clear data. Please try again.");
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password || !confirm) {
+      toast.error("Please enter and confirm your new password.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+    if (password !== confirm) {
+      toast.error("Passwords don't match.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await updatePassword(password);
+      if (error) {
+        toast.error(error);
+      } else {
+        toast.success("Password updated.");
+        setPassword("");
+        setConfirm("");
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -69,6 +110,61 @@ export default function SettingsPage() {
             </div>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </Link>
+        </section>
+
+        <section className="flex flex-col gap-2">
+          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider px-2">Password</h3>
+          <div className="bg-card rounded-2xl p-5 shadow-sm border">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <KeyRound className="w-5 h-5" />
+              </div>
+              <span className="font-bold">Change password</span>
+            </div>
+            {hasPasswordLogin ? (
+              <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="settings-new-password">New password</Label>
+                  <Input
+                    id="settings-new-password"
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-12 rounded-2xl"
+                    data-testid="input-new-password"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="settings-confirm-password">Confirm password</Label>
+                  <Input
+                    id="settings-confirm-password"
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    className="h-12 rounded-2xl"
+                    data-testid="input-confirm-password"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full rounded-full h-12 font-bold mt-1"
+                  disabled={submitting}
+                  data-testid="btn-update-password"
+                >
+                  Update password
+                </Button>
+              </form>
+            ) : (
+              <p className="text-sm text-muted-foreground" data-testid="text-no-password">
+                You signed in with Google, so there's no password to change. Manage your sign-in
+                from your Google account.
+              </p>
+            )}
+          </div>
         </section>
 
         <section className="flex flex-col gap-2">
