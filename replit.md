@@ -22,15 +22,26 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/anchored` — the Anchored web app (React + Vite + wouter).
+  - `src/lib/supabase-client.ts` — browser Supabase client (reads `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`).
+  - `src/lib/auth-context.tsx` — `AuthProvider` / `useAuth` (email + Google auth, session).
+  - `src/lib/anchors-context.tsx` — `AnchorsProvider` / `useAnchors` (async, user-scoped anchors & proofs).
+  - `src/lib/storage.ts` — Supabase data access for `anchors` / `proofs` (camelCase ↔ snake_case mapping).
+  - `src/pages/login.tsx` — auth screen; route protection lives in `src/App.tsx`.
+  - `supabase/migrations/0001_init.sql` — source-of-truth DB schema + RLS (applied manually in the Supabase dashboard).
+- `artifacts/api-server` — handles receipt/photo file uploads (`POST /api/receipts/upload`).
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Auth + per-user data use **Supabase** (Auth + Postgres). The browser talks to Supabase directly with the publishable/anon key; **Row-Level Security** (`user_id = auth.uid()`) is what isolates each user's data.
+- The publishable key (`sb_publishable_…`) is browser-safe and stored as the `VITE_SUPABASE_ANON_KEY` env var (embedded in the client bundle by design). The service-role key must never reach the frontend.
+- Supabase tables/RLS are **not** managed by the repl's Postgres tooling — `DATABASE_URL`/Helium is a different database. Schema changes are applied in the Supabase SQL Editor via `supabase/migrations/`.
+- One proof per anchor per day is enforced by a `unique (user_id, anchor_id, date_key)` constraint; saving a proof uses `upsert` on that key.
+- File uploads (receipts/photos) stay on the existing API server; only the resulting URL is stored on the proof row.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Anchored lets users build trustworthy daily proof that important routines were done (home safety, medication, bills, personal care, pet care). Users sign up (email/password or Google), pick anchors to track, and verify each one daily via self-confirm, photo, or receipt. Proofs form a timeline. All data is private per user.
 
 ## User preferences
 

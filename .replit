@@ -39,3 +39,5 @@ externalPort = 3000
 
 [userenv.shared]
 SUPABASE_URL = "https://zpjxbhbpnflynwhvsnmu.supabase.co"
+VITE_SUPABASE_URL = "https://zpjxbhbpnflynwhvsnmu.supabase.co"
+VITE_SUPABASE_ANON_KEY = "sb_publishable_pbGKmXDq5rgyN_DmstQzPQ_yEJBif0U"

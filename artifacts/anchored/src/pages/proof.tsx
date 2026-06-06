@@ -1,9 +1,10 @@
 import { useAnchors } from "@/lib/anchors-context";
 import { ProofCard } from "@/components/ProofCard";
 import { format, parseISO } from "date-fns";
+import { Loader2 } from "lucide-react";
 
 export default function ProofPage() {
-  const { proofs, anchors } = useAnchors();
+  const { proofs, anchors, loading } = useAnchors();
 
   // Group proofs by dateKey, sort descending
   const groupedProofs = proofs.reduce((acc, proof) => {
@@ -23,7 +24,11 @@ export default function ProofPage() {
         <p className="text-muted-foreground mt-1">Timeline of completed anchors.</p>
       </header>
 
-      {proofs.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center py-20 text-muted-foreground">
+          <Loader2 className="w-6 h-6 animate-spin" />
+        </div>
+      ) : proofs.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
           <div className="w-24 h-24 mb-6 rounded-full bg-muted flex items-center justify-center border-4 border-background shadow-inner">
             <span className="text-4xl text-muted-foreground/30">✓</span>

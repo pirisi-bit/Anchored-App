@@ -4,12 +4,21 @@ import { Category } from "@/lib/storage";
 import { getCategoryColor } from "@/components/AnchorCard";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export default function AnchorsPage() {
   const [, setLocation] = useLocation();
-  const { anchors, updateAnchorState } = useAnchors();
+  const { anchors, loading, updateAnchorState } = useAnchors();
+
+  const handleToggle = async (anchor: typeof anchors[number], checked: boolean) => {
+    try {
+      await updateAnchorState({ ...anchor, active: checked });
+    } catch (e) {
+      toast.error("Could not update. Please try again.");
+    }
+  };
 
   // Group anchors by category
   const grouped = anchors.reduce((acc, anchor) => {
@@ -28,7 +37,11 @@ export default function AnchorsPage() {
       </header>
 
       <div className="flex flex-col gap-6">
-        {anchors.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-12 text-muted-foreground">
+            <Loader2 className="w-6 h-6 animate-spin" />
+          </div>
+        ) : anchors.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <p>You haven't set up any anchors yet.</p>
           </div>
@@ -48,7 +61,7 @@ export default function AnchorsPage() {
                       </span>
                       <Switch 
                         checked={anchor.active} 
-                        onCheckedChange={(checked) => updateAnchorState({ ...anchor, active: checked })}
+                        onCheckedChange={(checked) => handleToggle(anchor, checked)}
                         data-testid={`switch-anchor-${anchor.id}`}
                       />
                     </div>

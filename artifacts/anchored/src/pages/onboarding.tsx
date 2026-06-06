@@ -4,6 +4,7 @@ import { useAnchors } from "@/lib/anchors-context";
 import { Category, Anchor } from "@/lib/storage";
 import { CategoryAccordion } from "@/components/CategoryAccordion";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const TEMPLATES: Record<Category, string[]> = {
   "Home Safety": ["Locked front door", "Turned off stove", "Checked windows", "Set alarm", "Turned off iron"],
@@ -32,7 +33,9 @@ export default function Onboarding() {
     return selectedTemplates.filter(t => t.category === category).map(t => t.name);
   };
 
-  const handleSave = () => {
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
     if (selectedTemplates.length === 0) return;
 
     const newAnchors: Anchor[] = selectedTemplates.map(t => ({
@@ -44,8 +47,14 @@ export default function Onboarding() {
       createdAt: new Date().toISOString()
     }));
 
-    addAnchors(newAnchors);
-    setLocation("/dashboard");
+    setSaving(true);
+    try {
+      await addAnchors(newAnchors);
+      setLocation("/dashboard");
+    } catch (e) {
+      toast.error("Could not save your anchors. Please try again.");
+      setSaving(false);
+    }
   };
 
   return (
@@ -75,11 +84,11 @@ export default function Onboarding() {
         <div className="max-w-md mx-auto">
           <Button 
             className="w-full rounded-full h-14 text-lg font-bold shadow-lg" 
-            disabled={selectedTemplates.length === 0}
+            disabled={selectedTemplates.length === 0 || saving}
             onClick={handleSave}
             data-testid="btn-save-onboarding"
           >
-            Add Selected ({selectedTemplates.length})
+            {saving ? "Saving…" : `Add Selected (${selectedTemplates.length})`}
           </Button>
         </div>
       </div>

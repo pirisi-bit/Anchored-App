@@ -1,123 +1,136 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { 
-  Anchor, 
-  Proof, 
-  getAnchors, 
-  getProofs, 
-  saveAnchor, 
-  saveAnchors as storageSaveAnchors, 
-  saveProof, 
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import {
+  Anchor,
+  Proof,
+  getAnchors,
+  getProofs,
+  insertAnchors,
+  updateAnchor,
+  upsertProof,
   getTodayKey,
-  clearData
+  clearData,
 } from "./storage";
+import { useAuth } from "./auth-context";
 
 interface AnchorsContextType {
   anchors: Anchor[];
   proofs: Proof[];
   todayKey: string;
-  addAnchors: (newAnchors: Anchor[]) => void;
-  updateAnchorState: (anchor: Anchor) => void;
-  selfConfirm: (anchorId: string) => void;
-  addPhotoProof: (anchorId: string, photoUrl: string) => void;
-  addReceiptProof: (anchorId: string, receiptUrl: string) => void;
+  loading: boolean;
+  addAnchors: (newAnchors: Anchor[]) => Promise<void>;
+  updateAnchorState: (anchor: Anchor) => Promise<void>;
+  selfConfirm: (anchorId: string) => Promise<void>;
+  addPhotoProof: (anchorId: string, photoUrl: string) => Promise<void>;
+  addReceiptProof: (anchorId: string, receiptUrl: string) => Promise<void>;
   getTodayProof: (anchorId: string) => Proof | undefined;
-  refresh: () => void;
-  clearAll: () => void;
+  refresh: () => Promise<void>;
+  clearAll: () => Promise<void>;
 }
 
 const AnchorsContext = createContext<AnchorsContextType | undefined>(undefined);
 
 export function AnchorsProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [anchors, setAnchors] = useState<Anchor[]>([]);
   const [proofs, setProofs] = useState<Proof[]>([]);
+  const [loading, setLoading] = useState(true);
   const todayKey = getTodayKey();
 
-  const refresh = () => {
-    setAnchors(getAnchors());
-    setProofs(getProofs());
-  };
+  const refresh = useCallback(async () => {
+    if (!user) {
+      setAnchors([]);
+      setProofs([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const [loadedAnchors, loadedProofs] = await Promise.all([getAnchors(), getProofs()]);
+      setAnchors(loadedAnchors);
+      setProofs(loadedProofs);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [refresh]);
 
-  const addAnchors = (newAnchors: Anchor[]) => {
-    const existing = getAnchors();
-    storageSaveAnchors([...existing, ...newAnchors]);
-    refresh();
+  const addAnchors = async (newAnchors: Anchor[]) => {
+    await insertAnchors(newAnchors);
+    await refresh();
   };
 
-  const updateAnchorState = (anchor: Anchor) => {
-    const existing = getAnchors();
-    const index = existing.findIndex(a => a.id === anchor.id);
-    if (index !== -1) {
-      existing[index] = anchor;
-      storageSaveAnchors(existing);
-      refresh();
-    }
+  const updateAnchorState = async (anchor: Anchor) => {
+    await updateAnchor(anchor);
+    await refresh();
   };
 
-  const selfConfirm = (anchorId: string) => {
-    saveProof({
+  const selfConfirm = async (anchorId: string) => {
+    await upsertProof({
       id: crypto.randomUUID(),
       anchorId,
       dateKey: todayKey,
       status: "Self-confirmed",
       verificationMethod: "Self-confirm",
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     });
-    refresh();
+    await refresh();
   };
 
-  const addPhotoProof = (anchorId: string, photoUrl: string) => {
-    saveProof({
+  const addPhotoProof = async (anchorId: string, photoUrl: string) => {
+    await upsertProof({
       id: crypto.randomUUID(),
       anchorId,
       dateKey: todayKey,
       status: "Verified",
       verificationMethod: "Photo",
       photoUrl,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     });
-    refresh();
+    await refresh();
   };
 
-  const addReceiptProof = (anchorId: string, receiptUrl: string) => {
-    saveProof({
+  const addReceiptProof = async (anchorId: string, receiptUrl: string) => {
+    await upsertProof({
       id: crypto.randomUUID(),
       anchorId,
       dateKey: todayKey,
       status: "Verified",
       verificationMethod: "Receipt",
       receiptUrl,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     });
-    refresh();
+    await refresh();
   };
 
   const getTodayProof = (anchorId: string) => {
-    return proofs.find(p => p.anchorId === anchorId && p.dateKey === todayKey);
+    return proofs.find((p) => p.anchorId === anchorId && p.dateKey === todayKey);
   };
 
-  const clearAll = () => {
-    clearData();
-    refresh();
+  const clearAll = async () => {
+    await clearData();
+    await refresh();
   };
 
   return (
-    <AnchorsContext.Provider value={{
-      anchors,
-      proofs,
-      todayKey,
-      addAnchors,
-      updateAnchorState,
-      selfConfirm,
-      addPhotoProof,
-      addReceiptProof,
-      getTodayProof,
-      refresh,
-      clearAll
-    }}>
+    <AnchorsContext.Provider
+      value={{
+        anchors,
+        proofs,
+        todayKey,
+        loading,
+        addAnchors,
+        updateAnchorState,
+        selfConfirm,
+        addPhotoProof,
+        addReceiptProof,
+        getTodayProof,
+        refresh,
+        clearAll,
+      }}
+    >
       {children}
     </AnchorsContext.Provider>
   );

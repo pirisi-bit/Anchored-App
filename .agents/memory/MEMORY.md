@@ -1,1 +1,2 @@
 - [Upload-then-link flows](upload-link-flows.md) — block sheet dismissal mid-upload (or capture target id at start) or the file uploads but the record never links.
+- [Supabase keys & which Postgres is which](supabase-keys-and-db.md) — sb_publishable_/anon key is browser-safe (VITE_ env, not a secret); the repl's Postgres is Helium, NOT Supabase, so migrations run in the Supabase dashboard.

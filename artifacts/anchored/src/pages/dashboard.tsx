@@ -7,11 +7,12 @@ import { ReceiptSheet } from "@/components/ReceiptSheet";
 import { format } from "date-fns";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { Anchor } from "@/lib/storage";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
-  const { anchors, proofs, todayKey, selfConfirm, addPhotoProof, addReceiptProof, getTodayProof } = useAnchors();
+  const { anchors, proofs, todayKey, loading, selfConfirm, addPhotoProof, addReceiptProof, getTodayProof } = useAnchors();
   const [activeAnchorForPhoto, setActiveAnchorForPhoto] = useState<Anchor | null>(null);
   const [activeAnchorForReceipt, setActiveAnchorForReceipt] = useState<Anchor | null>(null);
 
@@ -21,24 +22,38 @@ export default function Dashboard() {
   const progressPercent = activeAnchors.length > 0 ? (completedCount / activeAnchors.length) * 100 : 0;
   const allDone = activeAnchors.length > 0 && completedCount === activeAnchors.length;
 
-  const handleSelfConfirm = (anchorId: string) => {
-    selfConfirm(anchorId);
-    toast.success("Future You has proof. ✓");
-  };
-
-  const handlePhotoSave = (photoUrl: string) => {
-    if (activeAnchorForPhoto) {
-      addPhotoProof(activeAnchorForPhoto.id, photoUrl);
-      setActiveAnchorForPhoto(null);
-      toast.success("Proof saved. ✓");
+  const handleSelfConfirm = async (anchorId: string) => {
+    try {
+      await selfConfirm(anchorId);
+      toast.success("Future You has proof. ✓");
+    } catch (e) {
+      toast.error("Could not save. Please try again.");
     }
   };
 
-  const handleReceiptSave = (receiptUrl: string) => {
+  const handlePhotoSave = async (photoUrl: string) => {
+    if (activeAnchorForPhoto) {
+      const anchorId = activeAnchorForPhoto.id;
+      setActiveAnchorForPhoto(null);
+      try {
+        await addPhotoProof(anchorId, photoUrl);
+        toast.success("Proof saved. ✓");
+      } catch (e) {
+        toast.error("Could not save proof. Please try again.");
+      }
+    }
+  };
+
+  const handleReceiptSave = async (receiptUrl: string) => {
     if (activeAnchorForReceipt) {
-      addReceiptProof(activeAnchorForReceipt.id, receiptUrl);
+      const anchorId = activeAnchorForReceipt.id;
       setActiveAnchorForReceipt(null);
-      toast.success("Receipt saved. ✓");
+      try {
+        await addReceiptProof(anchorId, receiptUrl);
+        toast.success("Receipt saved. ✓");
+      } catch (e) {
+        toast.error("Could not save receipt. Please try again.");
+      }
     }
   };
 
@@ -58,7 +73,11 @@ export default function Dashboard() {
       </div>
 
       <div className="flex flex-col gap-3">
-        {activeAnchors.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-12 text-muted-foreground">
+            <Loader2 className="w-6 h-6 animate-spin" />
+          </div>
+        ) : activeAnchors.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <p className="mb-4">No active anchors.</p>
             <button className="text-primary font-medium underline" onClick={() => setLocation("/onboarding")}>Add some anchors</button>

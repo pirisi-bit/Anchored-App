@@ -4,7 +4,7 @@ import { useAnchors } from "@/lib/anchors-context";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getCategoryColor } from "@/components/AnchorCard";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Camera, Mic, ShieldAlert, Receipt as ReceiptIcon, FileText } from "lucide-react";
+import { ChevronLeft, Camera, Mic, ShieldAlert, Receipt as ReceiptIcon, FileText, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function isPdfUrl(url: string): boolean {
@@ -23,10 +23,18 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 export default function ProofReview() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/proof/:id");
-  const { proofs, anchors } = useAnchors();
+  const { proofs, anchors, loading } = useAnchors();
 
   const proof = proofs.find(p => p.id === params?.id);
   const anchor = proof ? anchors.find(a => a.id === proof.anchorId) : undefined;
+
+  if (loading) {
+    return (
+      <div className="min-h-[100dvh] flex items-center justify-center max-w-md mx-auto px-4">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!proof || !anchor) {
     return (
