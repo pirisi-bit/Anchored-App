@@ -16,6 +16,13 @@ the frontend.
 "requesting it as a secret" gives a false sense of protection and just blocks the
 agent. RLS — not key secrecy — is what protects user data with the publishable key.
 
+## Web and mobile share ONE Supabase project
+The Anchored web (Vite) and mobile (Expo) artifacts talk to the **same** Supabase
+project. The only difference is the env-var prefix the bundler exposes: web reads
+`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`; mobile reads
+`EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY`. Same publishable key,
+same RLS — so per-user data isolation carries across both clients with no extra work.
+
 ## The repl's Postgres ≠ the Supabase database
 `DATABASE_URL` / `PGHOST` here point at Replit's **Helium** Postgres, not Supabase
 (`*.supabase.co`). So the agent CANNOT apply Supabase table/RLS migrations through

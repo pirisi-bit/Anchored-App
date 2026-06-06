@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "2GusrlP4rofJTYTV7sA6f"
+uri = "file://artifacts/mobile/assets/images/icon.png"
+type = "image"
+title = "anchored app icon"
