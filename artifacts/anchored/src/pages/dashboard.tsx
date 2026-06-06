@@ -33,7 +33,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-24 px-4 pt-8">
+    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-36 px-4 pt-8">
       <header className="mb-6">
         <h2 className="text-muted-foreground font-medium mb-1 text-sm">{format(new Date(), "EEEE, MMMM d")}</h2>
         <h1 className="text-3xl font-extrabold tracking-tight">Anchored</h1>

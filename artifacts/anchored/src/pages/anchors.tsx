@@ -21,7 +21,7 @@ export default function AnchorsPage() {
   }, {} as Record<Category, typeof anchors>);
 
   return (
-    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-24 px-4 pt-8 relative">
+    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-36 px-4 pt-8 relative">
       <header className="mb-8">
         <h1 className="text-3xl font-extrabold tracking-tight">Manage Anchors</h1>
         <p className="text-muted-foreground mt-1">Enable or disable your tracked habits.</p>

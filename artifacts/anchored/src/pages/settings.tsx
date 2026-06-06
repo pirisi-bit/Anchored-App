@@ -19,7 +19,7 @@ export default function SettingsPage() {
   const { clearAll } = useAnchors();
 
   return (
-    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-24 px-4 pt-8">
+    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-36 px-4 pt-8">
       <header className="mb-8">
         <h1 className="text-3xl font-extrabold tracking-tight">Settings</h1>
       </header>

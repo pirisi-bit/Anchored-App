@@ -17,7 +17,7 @@ export default function ProofPage() {
   const sortedDates = Object.keys(groupedProofs).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-24 px-4 pt-8">
+    <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-36 px-4 pt-8">
       <header className="mb-8">
         <h1 className="text-3xl font-extrabold tracking-tight">Your Proof</h1>
         <p className="text-muted-foreground mt-1">Timeline of completed anchors.</p>
