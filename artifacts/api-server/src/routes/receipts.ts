@@ -12,6 +12,14 @@ const ALLOWED_MIME = new Set([
   "image/webp",
   "image/heic",
   "application/pdf",
+  "audio/webm",
+  "audio/mp4",
+  "audio/mpeg",
+  "audio/ogg",
+  "audio/wav",
+  "audio/aac",
+  "audio/x-m4a",
+  "audio/m4a",
 ]);
 
 const EXTENSION_BY_MIME: Record<string, string> = {
@@ -21,6 +29,14 @@ const EXTENSION_BY_MIME: Record<string, string> = {
   "image/webp": "webp",
   "image/heic": "heic",
   "application/pdf": "pdf",
+  "audio/webm": "webm",
+  "audio/mp4": "m4a",
+  "audio/mpeg": "mp3",
+  "audio/ogg": "ogg",
+  "audio/wav": "wav",
+  "audio/aac": "aac",
+  "audio/x-m4a": "m4a",
+  "audio/m4a": "m4a",
 };
 
 const upload = multer({

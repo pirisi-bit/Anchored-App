@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 
-export type VerificationMethod = "Self-confirm" | "Photo" | "Receipt";
+export type VerificationMethod = "Self-confirm" | "Photo" | "Receipt" | "Voice";
 export type ProofStatus = "Unverified" | "Self-confirmed" | "Verified";
 
 export type Category =
@@ -137,7 +137,7 @@ export async function getProofs(): Promise<Proof[]> {
   return (data as ProofRow[]).map(mapProof);
 }
 
-export async function upsertProof(proof: Proof): Promise<void> {
+export async function insertProof(proof: Proof): Promise<void> {
   const userId = await currentUserId();
   const row = {
     id: proof.id,
@@ -151,9 +151,17 @@ export async function upsertProof(proof: Proof): Promise<void> {
     voice_url: proof.voiceUrl ?? null,
     created_at: proof.createdAt,
   };
+  const { error } = await supabase.from("proofs").insert(row);
+  if (error) throw error;
+}
+
+export async function deleteProofById(proofId: string): Promise<void> {
+  const userId = await currentUserId();
   const { error } = await supabase
     .from("proofs")
-    .upsert(row, { onConflict: "user_id,anchor_id,date_key" });
+    .delete()
+    .eq("user_id", userId)
+    .eq("id", proofId);
   if (error) throw error;
 }
 

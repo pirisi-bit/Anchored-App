@@ -20,6 +20,7 @@
       "infoPlist": {
         "NSCameraUsageDescription": "Anchored uses the camera so you can capture a photo as proof that you completed a daily anchor.",
         "NSPhotoLibraryUsageDescription": "Anchored needs access to your photos so you can attach an existing image as proof for a daily anchor.",
+        "NSMicrophoneUsageDescription": "Anchored uses the microphone so you can record a short voice note as proof that you completed a daily anchor.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -28,7 +29,8 @@
       "versionCode": 1,
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.READ_MEDIA_IMAGES"
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -54,6 +56,12 @@
         {
           "cameraPermission": "Anchored uses the camera so you can capture a photo as proof that you completed a daily anchor.",
           "photosPermission": "Anchored needs access to your photos so you can attach an existing image as proof for a daily anchor."
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Anchored uses the microphone so you can record a short voice note as proof that you completed a daily anchor."
         }
       ]
     ],

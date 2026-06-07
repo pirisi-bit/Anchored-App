@@ -1,6 +1,6 @@
 import { supabase } from "./supabase-client";
 
-export type VerificationMethod = "Self-confirm" | "Photo" | "Receipt";
+export type VerificationMethod = "Self-confirm" | "Photo" | "Receipt" | "Voice";
 export type ProofStatus = "Unverified" | "Self-confirmed" | "Verified";
 
 export type Category = "Home Safety" | "Medication" | "Bills & Receipts" | "Personal Care" | "Pet Care" | "Other";
@@ -149,7 +149,9 @@ export async function getProofs(): Promise<Proof[]> {
   return (data as ProofRow[]).map(mapProof);
 }
 
-export async function upsertProof(proof: Proof): Promise<void> {
+// Each verification is its own row — users may log several checks for the same
+// anchor in a single day (see migration 0004).
+export async function insertProof(proof: Proof): Promise<void> {
   const userId = await currentUserId();
   const row = {
     id: proof.id,
@@ -163,20 +165,17 @@ export async function upsertProof(proof: Proof): Promise<void> {
     voice_url: proof.voiceUrl ?? null,
     created_at: proof.createdAt,
   };
-  const { error } = await supabase
-    .from("proofs")
-    .upsert(row, { onConflict: "user_id,anchor_id,date_key" });
+  const { error } = await supabase.from("proofs").insert(row);
   if (error) throw error;
 }
 
-export async function deleteProof(anchorId: string, dateKey: string): Promise<void> {
+export async function deleteProofById(id: string): Promise<void> {
   const userId = await currentUserId();
   const { error } = await supabase
     .from("proofs")
     .delete()
     .eq("user_id", userId)
-    .eq("anchor_id", anchorId)
-    .eq("date_key", dateKey);
+    .eq("id", id);
   if (error) throw error;
 }
 

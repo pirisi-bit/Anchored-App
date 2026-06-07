@@ -16,6 +16,7 @@ import { useT } from "@/lib/lang-context";
 import { AnchorCard } from "@/components/AnchorCard";
 import { ProgressBar } from "@/components/ProgressBar";
 import { CaptureSheet, type CaptureMode } from "@/components/CaptureSheet";
+import { VoiceCaptureSheet } from "@/components/VoiceCaptureSheet";
 import type { Anchor } from "@/lib/storage";
 
 function todayLabel(): string {
@@ -39,9 +40,12 @@ export default function DashboardScreen() {
     anchors,
     loading,
     getTodayProof,
+    getTodayProofs,
     selfConfirm,
     addPhotoProof,
     addReceiptProof,
+    addVoiceProof,
+    resetProof,
     refresh,
   } = useAnchors();
 
@@ -49,6 +53,7 @@ export default function DashboardScreen() {
     anchor: Anchor;
     mode: CaptureMode;
   } | null>(null);
+  const [voiceAnchor, setVoiceAnchor] = useState<Anchor | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [highlightId, setHighlightId] = useState<string | null>(null);
 
@@ -116,6 +121,12 @@ export default function DashboardScreen() {
       await addReceiptProof(anchor.id, url);
     }
     setCapture(null);
+  };
+
+  const handleVoiceUploaded = async (url: string) => {
+    if (!voiceAnchor) return;
+    await addVoiceProof(voiceAnchor.id, url);
+    setVoiceAnchor(null);
   };
 
   const progressHint =
@@ -187,6 +198,7 @@ export default function DashboardScreen() {
               <View style={styles.list}>
                 {activeAnchors.map((anchor) => {
                   const proof = getTodayProof(anchor.id);
+                  const count = getTodayProofs(anchor.id).length;
                   return (
                     <View
                       key={anchor.id}
@@ -198,10 +210,13 @@ export default function DashboardScreen() {
                       <AnchorCard
                         anchor={anchor}
                         proof={proof}
+                        proofCount={count}
                         highlighted={highlightId === anchor.id}
                         onSelfConfirm={() => selfConfirm(anchor.id)}
                         onPhoto={() => setCapture({ anchor, mode: "photo" })}
                         onReceipt={() => setCapture({ anchor, mode: "receipt" })}
+                        onVoice={() => setVoiceAnchor(anchor)}
+                        onReset={() => resetProof(anchor.id)}
                         onViewProof={() =>
                           proof && router.push(`/proof/${proof.id}`)
                         }
@@ -222,6 +237,15 @@ export default function DashboardScreen() {
           anchorName={capture.anchor.name}
           onClose={() => setCapture(null)}
           onUploaded={handleUploaded}
+        />
+      ) : null}
+
+      {voiceAnchor ? (
+        <VoiceCaptureSheet
+          visible
+          anchorName={voiceAnchor.name}
+          onClose={() => setVoiceAnchor(null)}
+          onUploaded={handleVoiceUploaded}
         />
       ) : null}
     </View>

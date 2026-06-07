@@ -26,7 +26,9 @@ _Replace the heading above with the project's name, and this line with one sente
   - `src/lib/supabase-client.ts` — browser Supabase client (reads `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`).
   - `src/lib/auth-context.tsx` — `AuthProvider` / `useAuth` (email + Google auth, session).
   - `src/lib/anchors-context.tsx` — `AnchorsProvider` / `useAnchors` (async, user-scoped anchors & proofs).
-  - `src/lib/storage.ts` — Supabase data access for `anchors` / `proofs` (camelCase ↔ snake_case mapping).
+  - `src/lib/storage.ts` — Supabase data access for `anchors` / `proofs` (camelCase ↔ snake_case mapping). `VerificationMethod` includes `Voice`; `insertProof` (plain insert, multiple proofs/day allowed) + `deleteProofById`.
+  - `src/components/VoiceSheet.tsx` — browser MediaRecorder voice-note recorder (≤15s cap + countdown, playback, re-record, uploads via `/api/receipts/upload`).
+  - `src/components/AnchorCard.tsx` — verification method picker (incl. Voice) + "Log another check" (multiple same-day proofs) / "Undo last" / verified count summary.
   - `src/pages/login.tsx` — auth screen (incl. "Forgot password?"); route protection lives in `src/App.tsx`.
   - `src/pages/reset-password.tsx` — set-new-password screen reached from the recovery email link; waits for the `PASSWORD_RECOVERY` session before showing the form.
   - `supabase/migrations/0001_init.sql` — source-of-truth DB schema + RLS (applied manually in the Supabase dashboard).
@@ -35,13 +37,15 @@ _Replace the heading above with the project's name, and this line with one sente
   - `lib/notifications.ts` — expo-notifications handler + daily-reminder scheduling helpers (web-guarded; native only).
   - `lib/reminders-context.tsx` — `RemindersProvider` / `useReminders` (persisted enable + time in AsyncStorage, permission request, reschedules the daily local reminder with today's unverified count).
   - Reminder UI lives in `app/(tabs)/settings.tsx` (toggle + time picker).
+  - `components/VoiceCaptureSheet.tsx` — native voice-note recorder using `expo-audio` (≤15s, playback, re-record). Mic permission declared in `app.json` (iOS `NSMicrophoneUsageDescription`, Android `RECORD_AUDIO`, `expo-audio` plugin). `app/proof/[id].tsx` plays voice proofs via `useAudioPlayer`.
+  - `components/AnchorCard.tsx` mirrors the web "Log another check" / "Undo last" + voice method.
 
 ## Architecture decisions
 
 - Auth + per-user data use **Supabase** (Auth + Postgres). The browser talks to Supabase directly with the publishable/anon key; **Row-Level Security** (`user_id = auth.uid()`) is what isolates each user's data.
 - The publishable key (`sb_publishable_…`) is browser-safe and stored as the `VITE_SUPABASE_ANON_KEY` env var (embedded in the client bundle by design). The service-role key must never reach the frontend.
 - Supabase tables/RLS are **not** managed by the repl's Postgres tooling — `DATABASE_URL`/Helium is a different database. Schema changes are applied in the Supabase SQL Editor via `supabase/migrations/`.
-- One proof per anchor per day is enforced by a `unique (user_id, anchor_id, date_key)` constraint; saving a proof uses `upsert` on that key.
+- Multiple proofs per anchor per day are allowed (e.g. re-checking the curling iron twice). Proofs are plain inserts; "Undo last" deletes only the latest today proof by id. (Migration `0004_multiple_proofs.sql` drops the old `unique (user_id, anchor_id, date_key)` constraint — run manually in the Supabase SQL Editor.)
 - File uploads (receipts/photos) stay on the existing API server; only the resulting URL is stored on the proof row.
 
 ## Product

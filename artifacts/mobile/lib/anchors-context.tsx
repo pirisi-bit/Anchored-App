@@ -14,7 +14,8 @@ import {
   getProofs,
   insertAnchors,
   updateAnchor,
-  upsertProof,
+  insertProof,
+  deleteProofById,
   getTodayKey,
   clearData,
 } from "./storage";
@@ -30,7 +31,10 @@ interface AnchorsContextType {
   selfConfirm: (anchorId: string) => Promise<void>;
   addPhotoProof: (anchorId: string, photoUrl: string) => Promise<void>;
   addReceiptProof: (anchorId: string, receiptUrl: string) => Promise<void>;
+  addVoiceProof: (anchorId: string, voiceUrl: string) => Promise<void>;
   getTodayProof: (anchorId: string) => Proof | undefined;
+  getTodayProofs: (anchorId: string) => Proof[];
+  resetProof: (anchorId: string) => Promise<void>;
   refresh: () => Promise<void>;
   clearAll: () => Promise<void>;
 }
@@ -79,7 +83,7 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
   };
 
   const selfConfirm = async (anchorId: string) => {
-    await upsertProof({
+    await insertProof({
       id: Crypto.randomUUID(),
       anchorId,
       dateKey: todayKey,
@@ -91,7 +95,7 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
   };
 
   const addPhotoProof = async (anchorId: string, photoUrl: string) => {
-    await upsertProof({
+    await insertProof({
       id: Crypto.randomUUID(),
       anchorId,
       dateKey: todayKey,
@@ -104,7 +108,7 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
   };
 
   const addReceiptProof = async (anchorId: string, receiptUrl: string) => {
-    await upsertProof({
+    await insertProof({
       id: Crypto.randomUUID(),
       anchorId,
       dateKey: todayKey,
@@ -116,8 +120,34 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
     await refresh();
   };
 
+  const addVoiceProof = async (anchorId: string, voiceUrl: string) => {
+    await insertProof({
+      id: Crypto.randomUUID(),
+      anchorId,
+      dateKey: todayKey,
+      status: "Verified",
+      verificationMethod: "Voice",
+      voiceUrl,
+      createdAt: new Date().toISOString(),
+    });
+    await refresh();
+  };
+
+  const getTodayProofs = (anchorId: string) => {
+    return proofs
+      .filter((p) => p.anchorId === anchorId && p.dateKey === todayKey)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  };
+
   const getTodayProof = (anchorId: string) => {
-    return proofs.find((p) => p.anchorId === anchorId && p.dateKey === todayKey);
+    return getTodayProofs(anchorId)[0];
+  };
+
+  const resetProof = async (anchorId: string) => {
+    const latest = getTodayProofs(anchorId)[0];
+    if (!latest) return;
+    await deleteProofById(latest.id);
+    await refresh();
   };
 
   const clearAll = async () => {
@@ -137,7 +167,10 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
         selfConfirm,
         addPhotoProof,
         addReceiptProof,
+        addVoiceProof,
         getTodayProof,
+        getTodayProofs,
+        resetProof,
         refresh,
         clearAll,
       }}

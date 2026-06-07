@@ -12,6 +12,7 @@ import { Image } from "expo-image";
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
 import { categoryColor } from "@/lib/categories";
@@ -165,6 +166,16 @@ export default function ProofReviewScreen() {
           </View>
         ) : null}
 
+        {proof.voiceUrl ? (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Feather name="mic" size={16} color={colors.mutedForeground} />
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Voice note</Text>
+            </View>
+            <VoicePlayer uri={proof.voiceUrl} />
+          </View>
+        ) : null}
+
         <Pressable
           onPress={back}
           style={({ pressed }) => [
@@ -176,6 +187,44 @@ export default function ProofReviewScreen() {
         </Pressable>
       </ScrollView>
     </View>
+  );
+}
+
+function VoicePlayer({ uri }: { uri: string }) {
+  const colors = useColors();
+  const player = useAudioPlayer(uri);
+  const status = useAudioPlayerStatus(player);
+
+  const toggle = () => {
+    if (status.playing) {
+      player.pause();
+    } else {
+      if (status.didJustFinish || status.currentTime >= status.duration) {
+        player.seekTo(0);
+      }
+      player.play();
+    }
+  };
+
+  return (
+    <Pressable
+      onPress={toggle}
+      style={({ pressed }) => [
+        styles.voiceCard,
+        { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.9 : 1 },
+      ]}
+    >
+      <View style={[styles.voiceIcon, { backgroundColor: colors.primary }]}>
+        <Feather
+          name={status.playing ? "pause" : "play"}
+          size={20}
+          color={colors.primaryForeground}
+        />
+      </View>
+      <Text style={[styles.voiceText, { color: colors.foreground }]}>
+        {status.playing ? "Playing…" : "Play voice note"}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -314,6 +363,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   pdfText: {
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+  },
+  voiceCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+  },
+  voiceIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  voiceText: {
     fontSize: 15,
     fontFamily: "Inter_600SemiBold",
   },

@@ -5,6 +5,7 @@ import { useT } from "@/lib/lang-context";
 import { AnchorCard } from "@/components/AnchorCard";
 import { PhotoSheet } from "@/components/PhotoSheet";
 import { ReceiptSheet } from "@/components/ReceiptSheet";
+import { VoiceSheet } from "@/components/VoiceSheet";
 import { TutorialOverlay } from "@/components/TutorialOverlay";
 import { format } from "date-fns";
 import { Progress } from "@/components/ui/progress";
@@ -17,10 +18,11 @@ type Filter = "all" | "verified" | "pending";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
-  const { anchors, loading, selfConfirm, addPhotoProof, addReceiptProof, resetProof, getTodayProof } = useAnchors();
+  const { anchors, loading, selfConfirm, addPhotoProof, addReceiptProof, addVoiceProof, resetProof, getTodayProof, getTodayProofs } = useAnchors();
   const t = useT();
   const [activeAnchorForPhoto, setActiveAnchorForPhoto] = useState<Anchor | null>(null);
   const [activeAnchorForReceipt, setActiveAnchorForReceipt] = useState<Anchor | null>(null);
+  const [activeAnchorForVoice, setActiveAnchorForVoice] = useState<Anchor | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -96,6 +98,19 @@ export default function Dashboard() {
       try {
         await addReceiptProof(anchorId, receiptUrl);
         toast.success("Receipt saved. ✓");
+      } catch {
+        toast.error(t.errors.couldNotSave);
+      }
+    }
+  };
+
+  const handleVoiceSave = async (voiceUrl: string) => {
+    if (activeAnchorForVoice) {
+      const anchorId = activeAnchorForVoice.id;
+      setActiveAnchorForVoice(null);
+      try {
+        await addVoiceProof(anchorId, voiceUrl);
+        toast.success("Voice proof saved. ✓");
       } catch {
         toast.error(t.errors.couldNotSave);
       }
@@ -188,14 +203,17 @@ export default function Dashboard() {
         ) : (
           visibleAnchors.map(anchor => {
             const todayProof = getTodayProof(anchor.id);
+            const todayCount = getTodayProofs(anchor.id).length;
             return (
               <AnchorCard
                 key={anchor.id}
                 anchor={anchor}
                 proof={todayProof}
+                proofCount={todayCount}
                 onSelfConfirm={() => handleSelfConfirm(anchor.id)}
                 onPhotoClick={() => setActiveAnchorForPhoto(anchor)}
                 onReceiptClick={() => setActiveAnchorForReceipt(anchor)}
+                onVoiceClick={() => setActiveAnchorForVoice(anchor)}
                 onReset={() => handleReset(anchor.id)}
                 onViewProof={() => todayProof && setLocation(`/proof/${todayProof.id}`)}
               />
@@ -216,6 +234,13 @@ export default function Dashboard() {
         onOpenChange={(open) => !open && setActiveAnchorForReceipt(null)}
         anchorName={activeAnchorForReceipt?.name || ""}
         onSave={handleReceiptSave}
+      />
+
+      <VoiceSheet
+        open={!!activeAnchorForVoice}
+        onOpenChange={(open) => !open && setActiveAnchorForVoice(null)}
+        anchorName={activeAnchorForVoice?.name || ""}
+        onSave={handleVoiceSave}
       />
 
       <TutorialOverlay

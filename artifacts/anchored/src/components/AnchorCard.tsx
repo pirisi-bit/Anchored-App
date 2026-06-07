@@ -3,18 +3,21 @@ import { Anchor, Proof, Category } from "@/lib/storage";
 import { getAnchorEmoji, getAnchorTint } from "@/lib/anchor-emoji";
 import { StatusBadge } from "./StatusBadge";
 import { Switch } from "@/components/ui/switch";
-import { Check, Camera, Receipt, RotateCcw } from "lucide-react";
+import { Check, Camera, Receipt, Mic, RotateCcw, Plus } from "lucide-react";
+import { format } from "date-fns";
 import { useT } from "@/lib/lang-context";
 import { cn } from "@/lib/utils";
 
-type Method = "self" | "photo" | "receipt";
+type Method = "self" | "photo" | "receipt" | "voice";
 
 interface AnchorCardProps {
   anchor: Anchor;
   proof?: Proof;
+  proofCount?: number;
   onSelfConfirm: () => void | Promise<void>;
   onPhotoClick: () => void | Promise<void>;
   onReceiptClick: () => void | Promise<void>;
+  onVoiceClick: () => void | Promise<void>;
   onReset: () => void | Promise<void>;
   onViewProof?: () => void;
   highlighted?: boolean;
@@ -35,9 +38,11 @@ export function getCategoryColor(category: Category) {
 export function AnchorCard({
   anchor,
   proof,
+  proofCount = 0,
   onSelfConfirm,
   onPhotoClick,
   onReceiptClick,
+  onVoiceClick,
   onReset,
   onViewProof,
   highlighted,
@@ -47,16 +52,24 @@ export function AnchorCard({
   const emoji = getAnchorEmoji(anchor);
   const tint = getAnchorTint(anchor);
   const [busy, setBusy] = useState<Method | null>(null);
+  // When already verified, the user can tap "Log another check" to re-open the
+  // method picker for an additional same-day verification.
+  const [reVerifying, setReVerifying] = useState(false);
+
+  const showPicker = !isDone || reVerifying;
 
   const run = async (method: Method, action: () => void | Promise<void>) => {
     if (busy) return;
     setBusy(method);
     try {
       await action();
+      setReVerifying(false);
     } finally {
       setBusy(null);
     }
   };
+
+  const lastTime = proof ? format(new Date(proof.createdAt), "p") : "";
 
   return (
     <div
@@ -84,10 +97,19 @@ export function AnchorCard({
         <StatusBadge status={proof ? proof.status : "Unverified"} />
       </div>
 
-      {!isDone && (
+      {/* When verified, show the check summary (count + last time). */}
+      {isDone && !reVerifying && (
+        <p className="text-xs font-medium text-brand-sage px-0.5">
+          {proofCount > 1
+            ? t.anchor.verifiedTimes(proofCount, lastTime)
+            : t.anchor.verifiedOnce(lastTime)}
+        </p>
+      )}
+
+      {showPicker && (
         <div className="flex flex-col gap-1 pt-1">
           <p className="text-xs font-semibold text-muted-foreground px-1 pb-1">
-            {t.anchor.howVerify}
+            {reVerifying ? t.anchor.checkAgainHint : t.anchor.howVerify}
           </p>
           <MethodRow
             icon={<Check className="w-4 h-4" />}
@@ -116,10 +138,28 @@ export function AnchorCard({
             onActivate={() => run("receipt", onReceiptClick)}
             testId={`btn-receipt-${anchor.id}`}
           />
+          <MethodRow
+            icon={<Mic className="w-4 h-4" />}
+            label={t.anchor.voice}
+            hint={t.anchor.voiceHint}
+            checked={busy === "voice"}
+            disabled={busy !== null && busy !== "voice"}
+            onActivate={() => run("voice", onVoiceClick)}
+            testId={`btn-voice-${anchor.id}`}
+          />
+          {reVerifying && (
+            <button
+              className="text-xs text-muted-foreground hover:text-foreground self-start mt-1 px-1"
+              onClick={() => setReVerifying(false)}
+              disabled={busy !== null}
+            >
+              {t.tutorial.skip}
+            </button>
+          )}
         </div>
       )}
 
-      {isDone && (
+      {isDone && !reVerifying && (
         <div className="flex items-center justify-between pt-0.5">
           <button
             className="text-xs text-primary font-medium hover:underline"
@@ -128,15 +168,26 @@ export function AnchorCard({
           >
             {t.anchor.viewProof}
           </button>
-          <button
-            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-            onClick={() => run("self", onReset)}
-            disabled={busy !== null}
-            data-testid={`btn-reset-${anchor.id}`}
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            {t.anchor.reset}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline disabled:opacity-50"
+              onClick={() => setReVerifying(true)}
+              disabled={busy !== null}
+              data-testid={`btn-log-another-${anchor.id}`}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {t.anchor.logAnother}
+            </button>
+            <button
+              className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+              onClick={() => run("self", onReset)}
+              disabled={busy !== null}
+              data-testid={`btn-reset-${anchor.id}`}
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              {t.anchor.undoLast}
+            </button>
+          </div>
         </div>
       )}
     </div>
