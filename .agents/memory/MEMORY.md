@@ -3,6 +3,8 @@
 - [Supabase keys & which Postgres is which](supabase-keys-and-db.md) — sb_publishable_/anon key is browser-safe (VITE_/EXPO_PUBLIC_ env, not a secret); web+mobile share ONE Supabase project; the repl's Postgres is Helium, NOT Supabase, so migrations run in the Supabase dashboard.
 - [Expo scaffold useColors](expo-scaffold-usecolors.md) — adding a non-palette top-level key (e.g. radius) to constants/colors.ts breaks the scaffold's generic useColors cast; index colors.light/.dark directly.
 - [Mobile publishing path](mobile-publishing.md) — no EAS/eas.json on Replit; iOS ships via Expo Launch (suggestDeploy from main agent only), Android unsupported; "store" tasks = finalize app.json readiness.
+- [Supabase Storage bucket mime types](supabase-storage-bucket-mimetypes.md) — allowedMimeTypes is fixed at createBucket; existing buckets need updateBucket (use wildcards) or new upload types 415, despite the server allowlist.
+- [Async refresh user-id guard](anchors-provider-refresh-race.md) — context refresh must gate state commits by current user id + a request token, else a stale no-user/empty load misroutes the just-logged-in user to onboarding.
 - [Switch as async trigger](switch-as-async-trigger.md) — a toggle that fires an async action must show pending (checked+disabled) state, not checked={false}, or it bounces back and double-fires.
 - [Custom anchor DB migration](custom-anchor-migration.md) — emoji+color columns must be added via 0002_custom_anchors.sql in Supabase before CreateAnchorSheet saves correctly.
 - [Store screenshot generation](store-screenshot-generation.md) — no Playwright/Chromium, but ImageMagick+librsvg renders SVG marketing frames to exact store sizes; install brand TTFs to ~/.fonts.

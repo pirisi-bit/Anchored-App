@@ -26,6 +26,13 @@ export function getSupabase(): SupabaseClient {
 
 let bucketReady = false;
 
+// Mime types the receipts bucket accepts: images + PDF (receipts/photos) and
+// audio (voice-note proofs). Wildcards keep this robust across the various
+// audio container subtypes browsers/native emit (audio/webm, audio/mp4,
+// audio/m4a, audio/x-m4a, ...). Per-request validation still happens against
+// the stricter ALLOWED_MIME set in routes/receipts.ts.
+const BUCKET_ALLOWED_MIME = ["image/*", "application/pdf", "audio/*"];
+
 export async function ensureReceiptsBucket(): Promise<void> {
   if (bucketReady) return;
 
@@ -42,7 +49,7 @@ export async function ensureReceiptsBucket(): Promise<void> {
     const { error: createError } = await supabase.storage.createBucket(RECEIPTS_BUCKET, {
       public: true,
       fileSizeLimit: "10MB",
-      allowedMimeTypes: ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/heic", "application/pdf"],
+      allowedMimeTypes: BUCKET_ALLOWED_MIME,
     });
 
     if (createError) {
@@ -50,6 +57,21 @@ export async function ensureReceiptsBucket(): Promise<void> {
     }
 
     logger.info({ bucket: RECEIPTS_BUCKET }, "Created Supabase storage bucket");
+  } else {
+    // An existing bucket may have been created before audio (voice notes) was
+    // supported, so its allowedMimeTypes would reject .m4a uploads. Update it
+    // so voice-note proofs can be stored.
+    const { error: updateError } = await supabase.storage.updateBucket(RECEIPTS_BUCKET, {
+      public: true,
+      fileSizeLimit: "10MB",
+      allowedMimeTypes: BUCKET_ALLOWED_MIME,
+    });
+
+    if (updateError) {
+      throw new Error(`Failed to update receipts bucket: ${updateError.message}`);
+    }
+
+    logger.info({ bucket: RECEIPTS_BUCKET }, "Ensured Supabase storage bucket accepts current mime types");
   }
 
   bucketReady = true;

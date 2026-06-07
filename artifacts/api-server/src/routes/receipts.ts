@@ -55,7 +55,7 @@ router.post("/receipts/upload", upload.single("file"), async (req, res) => {
 
     if (!ALLOWED_MIME.has(file.mimetype)) {
       res.status(400).json({
-        error: `Unsupported file type "${file.mimetype}". Allowed: images (PNG, JPG, WEBP, HEIC) and PDF.`,
+        error: `Unsupported file type "${file.mimetype}". Allowed: images (PNG, JPG, WEBP, HEIC), PDF, and audio (voice notes).`,
       });
       return;
     }

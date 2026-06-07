@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import {
   Anchor,
   Proof,
@@ -38,22 +38,38 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
   const [anchors, setAnchors] = useState<Anchor[]>([]);
   const [proofs, setProofs] = useState<Proof[]>([]);
   const [loading, setLoading] = useState(true);
+  // Tracks which user's data is currently loaded. Without this, after the
+  // initial no-user refresh sets loading=false with empty anchors, a freshly
+  // logged-in user has one render where loading reads false and anchors are
+  // still []. Routing gates would then send them to onboarding even though
+  // they have anchors. We treat data as "not ready" until it's loaded for the
+  // current user id.
+  const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
+  // Monotonic token so overlapping refreshes (e.g. fast logout/login or account
+  // switch) can't commit stale results: only the latest refresh is allowed to
+  // write state. Prevents both obsolete data overwrites and a stuck loading gate.
+  const refreshToken = useRef(0);
   const todayKey = getTodayKey();
 
   const refresh = useCallback(async () => {
+    const token = ++refreshToken.current;
     if (!user) {
       setAnchors([]);
       setProofs([]);
+      setLoadedUserId(null);
       setLoading(false);
       return;
     }
+    const userId = user.id;
     setLoading(true);
     try {
       const [loadedAnchors, loadedProofs] = await Promise.all([getAnchors(), getProofs()]);
+      if (token !== refreshToken.current) return;
       setAnchors(loadedAnchors);
       setProofs(loadedProofs);
+      setLoadedUserId(userId);
     } finally {
-      setLoading(false);
+      if (token === refreshToken.current) setLoading(false);
     }
   }, [user]);
 
@@ -148,13 +164,18 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
     await refresh();
   };
 
+  // For a logged-in user, treat data as still loading until it has actually
+  // been fetched for that user id. This avoids a brief stale window (empty
+  // anchors + loading=false) right after login that would mis-route the user.
+  const effectiveLoading = user ? loading || loadedUserId !== user.id : loading;
+
   return (
     <AnchorsContext.Provider
       value={{
         anchors,
         proofs,
         todayKey,
-        loading,
+        loading: effectiveLoading,
         addAnchors,
         updateAnchorState,
         selfConfirm,
