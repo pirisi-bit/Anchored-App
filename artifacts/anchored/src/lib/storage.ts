@@ -5,6 +5,13 @@ export type ProofStatus = "Unverified" | "Self-confirmed" | "Verified";
 
 export type Category = "Home Safety" | "Medication" | "Bills & Receipts" | "Personal Care" | "Pet Care" | "Other";
 
+export interface AnchorReminder {
+  enabled: boolean;
+  days: number[];   // 0=Sun … 6=Sat; empty = every day
+  hour: number;     // 0–23
+  minute: number;   // 0, 15, 30, 45
+}
+
 export interface Anchor {
   id: string;
   name: string;
@@ -14,12 +21,13 @@ export interface Anchor {
   createdAt: string;
   emoji?: string;
   color?: string;
+  reminder?: AnchorReminder;
 }
 
 export interface Proof {
   id: string;
   anchorId: string;
-  dateKey: string; // "2025-06-06"
+  dateKey: string;
   status: ProofStatus;
   verificationMethod: VerificationMethod;
   photoUrl?: string;
@@ -38,6 +46,7 @@ interface AnchorRow {
   created_at: string;
   emoji?: string | null;
   color?: string | null;
+  reminder?: AnchorReminder | null;
 }
 
 interface ProofRow {
@@ -63,6 +72,7 @@ function mapAnchor(row: AnchorRow): Anchor {
     createdAt: row.created_at,
     emoji: row.emoji ?? undefined,
     color: row.color ?? undefined,
+    reminder: row.reminder ?? undefined,
   };
 }
 
@@ -82,9 +92,7 @@ function mapProof(row: ProofRow): Proof {
 
 async function currentUserId(): Promise<string> {
   const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
-    throw new Error("Not authenticated");
-  }
+  if (error || !data.user) throw new Error("Not authenticated");
   return data.user.id;
 }
 
@@ -110,6 +118,7 @@ export async function insertAnchors(anchors: Anchor[]): Promise<void> {
     created_at: a.createdAt,
     ...(a.emoji ? { emoji: a.emoji } : {}),
     ...(a.color ? { color: a.color } : {}),
+    reminder: a.reminder ?? null,
   }));
   const { error } = await supabase.from("anchors").insert(rows);
   if (error) throw error;
@@ -125,6 +134,7 @@ export async function updateAnchor(anchor: Anchor): Promise<void> {
       active: anchor.active,
       ...(anchor.emoji ? { emoji: anchor.emoji } : {}),
       ...(anchor.color ? { color: anchor.color } : {}),
+      reminder: anchor.reminder ?? null,
     })
     .eq("id", anchor.id);
   if (error) throw error;

@@ -26,6 +26,7 @@ export default function AnchorsScreen() {
   const t = useT();
   const { anchors, loading, updateAnchorState } = useAnchors();
 
+  // Group by category (CATEGORY_ORDER) and sort active before inactive within each group
   const grouped = useMemo(() => {
     const map = new Map<Category, Anchor[]>();
     for (const anchor of anchors) {
@@ -33,9 +34,14 @@ export default function AnchorsScreen() {
       list.push(anchor);
       map.set(anchor.category, list);
     }
-    return CATEGORY_ORDER.filter((c) => map.has(c)).map(
-      (c) => [c, map.get(c)!] as const,
-    );
+    return CATEGORY_ORDER.filter((c) => map.has(c)).map((c) => {
+      const list = map.get(c)!;
+      const sorted = [...list].sort((a, b) => {
+        if (a.active === b.active) return 0;
+        return a.active ? -1 : 1; // active first
+      });
+      return [c, sorted] as const;
+    });
   }, [anchors]);
 
   const topPad = insets.top + (Platform.OS === "web" ? 67 : 0) + 8;
@@ -75,64 +81,114 @@ export default function AnchorsScreen() {
           </View>
         ) : (
           <View style={styles.groups}>
-            {grouped.map(([category, list]) => (
-              <View key={category} style={styles.group}>
-                <View
-                  style={[
-                    styles.categoryChip,
-                    { backgroundColor: categoryColor(category, colors) },
-                  ]}
-                >
-                  <Text style={styles.categoryChipText}>
-                    {t.categories[category] ?? category}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    styles.groupCard,
-                    { backgroundColor: colors.card, borderColor: colors.border },
-                  ]}
-                >
-                  {list.map((anchor, i) => (
-                    <View
-                      key={anchor.id}
-                      style={[
-                        styles.row,
-                        i !== list.length - 1 && {
-                          borderBottomWidth: 1,
-                          borderBottomColor: colors.border,
-                        },
-                      ]}
-                    >
-                      {anchor.emoji ? (
-                        <Text style={styles.emoji}>{anchor.emoji}</Text>
-                      ) : null}
-                      <Text
+            {grouped.map(([category, list]) => {
+              const activeList = list.filter((a) => a.active);
+              const inactiveList = list.filter((a) => !a.active);
+
+              return (
+                <View key={category} style={styles.group}>
+                  <View
+                    style={[
+                      styles.categoryChip,
+                      { backgroundColor: categoryColor(category, colors) },
+                    ]}
+                  >
+                    <Text style={styles.categoryChipText}>
+                      {t.categories[category] ?? category}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.groupCard,
+                      { backgroundColor: colors.card, borderColor: colors.border },
+                    ]}
+                  >
+                    {/* Active anchors */}
+                    {activeList.map((anchor, i) => (
+                      <View
+                        key={anchor.id}
                         style={[
-                          styles.anchorName,
-                          {
-                            color: anchor.active
-                              ? colors.foreground
-                              : colors.mutedForeground,
-                            textDecorationLine: anchor.active
-                              ? "none"
-                              : "line-through",
+                          styles.row,
+                          (i !== activeList.length - 1 || inactiveList.length > 0) && {
+                            borderBottomWidth: 1,
+                            borderBottomColor: colors.border,
                           },
                         ]}
                       >
-                        {anchor.name}
-                      </Text>
-                      <Switch
-                        value={anchor.active}
-                        onValueChange={(v) => handleToggle(anchor, v)}
-                        trackColor={{ false: colors.muted, true: colors.primary }}
-                        thumbColor="#FFFFFF"
-                      />
-                    </View>
-                  ))}
+                        {anchor.emoji ? (
+                          <Text style={styles.emoji}>{anchor.emoji}</Text>
+                        ) : null}
+                        <Text
+                          style={[
+                            styles.anchorName,
+                            { color: colors.foreground },
+                          ]}
+                        >
+                          {anchor.name}
+                        </Text>
+                        <Switch
+                          value={anchor.active}
+                          onValueChange={(v) => handleToggle(anchor, v)}
+                          trackColor={{ false: colors.muted, true: colors.primary }}
+                          thumbColor="#FFFFFF"
+                        />
+                      </View>
+                    ))}
+
+                    {/* Inactive section divider */}
+                    {inactiveList.length > 0 && activeList.length > 0 && (
+                      <View
+                        style={[
+                          styles.dividerRow,
+                          { backgroundColor: colors.muted + "40" },
+                        ]}
+                      >
+                        <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                        <Text style={[styles.dividerLabel, { color: colors.mutedForeground }]}>
+                          {t.anchors.inactive}
+                        </Text>
+                        <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                      </View>
+                    )}
+
+                    {/* Inactive anchors */}
+                    {inactiveList.map((anchor, i) => (
+                      <View
+                        key={anchor.id}
+                        style={[
+                          styles.row,
+                          styles.rowInactive,
+                          i !== inactiveList.length - 1 && {
+                            borderBottomWidth: 1,
+                            borderBottomColor: colors.border,
+                          },
+                        ]}
+                      >
+                        {anchor.emoji ? (
+                          <Text style={[styles.emoji, styles.emojiInactive]}>{anchor.emoji}</Text>
+                        ) : null}
+                        <Text
+                          style={[
+                            styles.anchorName,
+                            styles.anchorNameInactive,
+                            { color: colors.mutedForeground },
+                          ]}
+                        >
+                          {anchor.name}
+                        </Text>
+                        <Switch
+                          value={anchor.active}
+                          onValueChange={(v) => handleToggle(anchor, v)}
+                          trackColor={{ false: colors.muted, true: colors.primary }}
+                          thumbColor="#FFFFFF"
+                        />
+                      </View>
+                    ))}
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
       </ScrollView>
@@ -202,14 +258,40 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 8,
   },
+  rowInactive: {
+    opacity: 0.6,
+  },
   emoji: {
     fontSize: 20,
+  },
+  emojiInactive: {
+    opacity: 0.7,
   },
   anchorName: {
     fontSize: 15,
     fontFamily: "Inter_500Medium",
     flex: 1,
     marginRight: 4,
+  },
+  anchorNameInactive: {
+    textDecorationLine: "line-through",
+  },
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 8,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+  },
+  dividerLabel: {
+    fontSize: 9,
+    fontFamily: "Inter_600SemiBold",
+    textTransform: "uppercase",
+    letterSpacing: 1.5,
   },
   fab: {
     position: "absolute",

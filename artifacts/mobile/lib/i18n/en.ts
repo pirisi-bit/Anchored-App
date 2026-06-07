@@ -28,6 +28,7 @@ export const en = {
     title: "Manage Anchors",
     subtitle: "Enable or disable your tracked habits.",
     noAnchors: "You haven't set up any anchors yet.",
+    inactive: "Inactive",
     couldNotUpdate: "Could not update",
     tryAgain: "Please try again.",
   },

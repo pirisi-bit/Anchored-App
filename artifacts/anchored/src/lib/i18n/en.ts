@@ -13,6 +13,8 @@ export const en = {
     allDone: "All done for today! 🎉",
     noAnchors: "No active anchors.",
     addAnchors: "Add some anchors",
+    filterVerified: "Showing verified",
+    filterPending: "Showing pending",
   },
   anchor: {
     howVerify: "How will you verify this?",
@@ -36,6 +38,7 @@ export const en = {
     subtitle: "Enable or disable your tracked habits.",
     noAnchors: "You haven't set up any anchors yet.",
     createCustom: "Create custom anchor",
+    inactiveSection: "Inactive",
   },
   createAnchor: {
     title: "New Anchor",
@@ -46,6 +49,51 @@ export const en = {
     colorLabel: "Color",
     save: "Save anchor",
     nameRequired: "Please enter a name.",
+  },
+  reminder: {
+    title: "Reminder",
+    setReminder: "Set reminder",
+    removeReminder: "Remove reminder",
+    everyday: "Every day",
+    days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    timeLabel: "Time",
+    save: "Save",
+    noReminder: "No reminder",
+    active: "Reminder set",
+    reminderSummary: (days: string, time: string) => `${days} at ${time}`,
+  },
+  tutorial: {
+    skip: "Skip",
+    next: "Next →",
+    done: "Let's go →",
+    triggerBtn: "Tutorial",
+    steps: [
+      {
+        emoji: "⚓",
+        title: "Welcome to Anchored",
+        body: "Build trustworthy daily proof that your most important routines are done. Peace of mind, every day.",
+      },
+      {
+        emoji: "🏠",
+        title: "Pick your anchors",
+        body: "Choose the routines that matter — locking the door, taking medication, feeding your pet. Add as many as you need.",
+      },
+      {
+        emoji: "✅",
+        title: "Verify each day",
+        body: "Self-confirm, snap a photo, or save a receipt. Pick whatever fits each routine. Your proof is stored safely.",
+      },
+      {
+        emoji: "📊",
+        title: "Watch your progress",
+        body: "See verified vs pending at a glance on the dashboard. Tap either card to filter and focus.",
+      },
+      {
+        emoji: "🔔",
+        title: "Set reminders",
+        body: "Tap the bell on any anchor to add a daily or weekly reminder so you never miss a verification.",
+      },
+    ],
   },
   settings: {
     title: "Settings",
@@ -71,6 +119,7 @@ export const en = {
       confirm: "Delete everything",
     },
     languageSection: "Language",
+    helpSection: "Help",
     version: "Anchored v1.0",
     synced: "Synced securely to your account.",
   },
@@ -100,6 +149,8 @@ export const en = {
     dataCleared: "All data cleared.",
     proofReset: "Reset. You can verify it again.",
     anchorSaved: "Anchor saved!",
+    reminderSaved: "Reminder saved.",
+    reminderRemoved: "Reminder removed.",
   },
 };
 

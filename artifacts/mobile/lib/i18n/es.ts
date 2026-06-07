@@ -53,6 +53,7 @@ export const es: Translations = {
     title: "Mis Anclajes",
     subtitle: "Activa o desactiva tus rutinas.",
     noAnchors: "Todavía no tienes anclajes configurados.",
+    inactive: "Inactivos",
     couldNotUpdate: "No se pudo actualizar",
     tryAgain: "Por favor intenta de nuevo.",
   },

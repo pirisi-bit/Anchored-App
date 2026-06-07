@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Trash2, User, ChevronRight, LogOut, KeyRound, Globe } from "lucide-react";
+import { Plus, Trash2, User, ChevronRight, LogOut, KeyRound, Globe, HelpCircle, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
@@ -42,7 +42,7 @@ export default function SettingsPage() {
     try {
       await clearAll();
       toast.success(t.success.dataCleared);
-    } catch (e) {
+    } catch {
       toast.error(t.errors.couldNotClear);
     }
   };
@@ -85,9 +85,18 @@ export default function SettingsPage() {
   const handleSignOut = async () => {
     try {
       await signOut();
-    } catch (e) {
+    } catch {
       toast.error(t.errors.couldNotSignOut);
     }
+  };
+
+  const handleShowTutorial = () => {
+    // Navigate to home then trigger tutorial overlay
+    window.dispatchEvent(new Event("show-tutorial"));
+    // Small delay so navigation completes if user is on settings
+    setTimeout(() => {
+      window.location.hash = "";
+    }, 50);
   };
 
   return (
@@ -158,6 +167,29 @@ export default function SettingsPage() {
             </div>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </Link>
+        </section>
+
+        {/* Help */}
+        <section className="flex flex-col gap-2">
+          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider px-2">
+            {t.settings.helpSection}
+          </h3>
+          <button
+            onClick={handleShowTutorial}
+            className="bg-card rounded-2xl p-4 shadow-sm border flex items-center justify-between hover:bg-muted/50 transition-colors w-full text-left"
+            data-testid="btn-show-tutorial"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="font-bold block">{t.tutorial.triggerBtn}</span>
+                <span className="text-xs text-muted-foreground">5-step intro to Anchored</span>
+              </div>
+            </div>
+            <HelpCircle className="w-5 h-5 text-muted-foreground" />
+          </button>
         </section>
 
         {/* Password */}

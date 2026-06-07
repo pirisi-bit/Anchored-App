@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAnchors } from "@/lib/anchors-context";
 import { useT } from "@/lib/lang-context";
-import { Category } from "@/lib/storage";
+import { Anchor, AnchorReminder, Category } from "@/lib/storage";
 import { getCategoryColor } from "@/components/AnchorCard";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { CreateAnchorSheet } from "@/components/CreateAnchorSheet";
-import { Plus, Loader2, PenLine } from "lucide-react";
+import { AnchorReminderSheet } from "@/components/AnchorReminderSheet";
+import { Plus, Loader2, PenLine, Bell, BellRing } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -16,20 +17,31 @@ export default function AnchorsPage() {
   const { anchors, loading, updateAnchorState } = useAnchors();
   const t = useT();
   const [createOpen, setCreateOpen] = useState(false);
+  const [reminderAnchor, setReminderAnchor] = useState<Anchor | null>(null);
 
-  const handleToggle = async (anchor: typeof anchors[number], checked: boolean) => {
+  const handleToggle = async (anchor: Anchor, checked: boolean) => {
     try {
       await updateAnchorState({ ...anchor, active: checked });
-    } catch (e) {
+    } catch {
       toast.error(t.errors.couldNotUpdate);
     }
   };
 
+  const handleSaveReminder = async (anchor: Anchor, reminder: AnchorReminder | undefined) => {
+    try {
+      await updateAnchorState({ ...anchor, reminder });
+      toast.success(reminder ? t.success.reminderSaved : t.success.reminderRemoved);
+    } catch {
+      toast.error(t.errors.couldNotUpdate);
+    }
+  };
+
+  // Group and sort: active first within each category, inactive below
   const grouped = anchors.reduce((acc, anchor) => {
     if (!acc[anchor.category]) acc[anchor.category] = [];
     acc[anchor.category].push(anchor);
     return acc;
-  }, {} as Record<string, typeof anchors>);
+  }, {} as Record<string, Anchor[]>);
 
   return (
     <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-36 px-4 pt-8 relative">
@@ -62,31 +74,56 @@ export default function AnchorsPage() {
         ) : (
           Object.entries(grouped).map(([categoryStr, categoryAnchors]) => {
             const category = categoryStr as Category;
+
+            // Sort: active anchors first, inactive at bottom
+            const sorted = [...categoryAnchors].sort((a, b) => {
+              if (a.active === b.active) return 0;
+              return a.active ? -1 : 1;
+            });
+
+            const activeList = sorted.filter((a) => a.active);
+            const inactiveList = sorted.filter((a) => !a.active);
+
             return (
               <div key={category} className="flex flex-col gap-2">
                 <div className={cn("px-4 py-2 rounded-xl text-sm font-bold shadow-sm inline-block self-start", getCategoryColor(category))}>
                   {t.categories[category] ?? category}
                 </div>
+
                 <div className="bg-card rounded-2xl shadow-sm border overflow-hidden">
-                  {categoryAnchors.map((anchor, i) => (
-                    <div
+                  {/* Active anchors */}
+                  {activeList.map((anchor, i) => (
+                    <AnchorRow
                       key={anchor.id}
-                      className={cn("flex items-center gap-3 justify-between p-4", i !== categoryAnchors.length - 1 && "border-b")}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        {anchor.emoji && (
-                          <span className="text-xl shrink-0" aria-hidden>{anchor.emoji}</span>
-                        )}
-                        <span className={cn("font-medium truncate", !anchor.active && "text-muted-foreground line-through")}>
-                          {anchor.name}
-                        </span>
-                      </div>
-                      <Switch
-                        checked={anchor.active}
-                        onCheckedChange={(checked) => handleToggle(anchor, checked)}
-                        data-testid={`switch-anchor-${anchor.id}`}
-                      />
+                      anchor={anchor}
+                      showBorder={i !== activeList.length - 1 || inactiveList.length > 0}
+                      onToggle={handleToggle}
+                      onReminderClick={() => setReminderAnchor(anchor)}
+                      t={t}
+                    />
+                  ))}
+
+                  {/* Inactive section divider */}
+                  {inactiveList.length > 0 && activeList.length > 0 && (
+                    <div className="flex items-center gap-2 px-4 py-1.5 bg-muted/40">
+                      <div className="flex-1 h-px bg-border" />
+                      <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                        {t.anchorsPage.inactiveSection}
+                      </span>
+                      <div className="flex-1 h-px bg-border" />
                     </div>
+                  )}
+
+                  {/* Inactive anchors */}
+                  {inactiveList.map((anchor, i) => (
+                    <AnchorRow
+                      key={anchor.id}
+                      anchor={anchor}
+                      showBorder={i !== inactiveList.length - 1}
+                      onToggle={handleToggle}
+                      onReminderClick={() => setReminderAnchor(anchor)}
+                      t={t}
+                    />
                   ))}
                 </div>
               </div>
@@ -106,6 +143,70 @@ export default function AnchorsPage() {
       </Button>
 
       <CreateAnchorSheet open={createOpen} onOpenChange={setCreateOpen} />
+
+      <AnchorReminderSheet
+        anchor={reminderAnchor}
+        open={!!reminderAnchor}
+        onClose={() => setReminderAnchor(null)}
+        onSave={handleSaveReminder}
+      />
+    </div>
+  );
+}
+
+// ── Extracted row component ────────────────────────────────────────────────
+
+interface AnchorRowProps {
+  anchor: Anchor;
+  showBorder: boolean;
+  onToggle: (anchor: Anchor, checked: boolean) => void;
+  onReminderClick: () => void;
+  t: ReturnType<typeof useT>;
+}
+
+function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, t }: AnchorRowProps) {
+  const hasReminder = !!anchor.reminder?.enabled;
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-2 justify-between px-4 py-3",
+        showBorder && "border-b",
+        !anchor.active && "opacity-60"
+      )}
+    >
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        {anchor.emoji && (
+          <span className="text-xl shrink-0" aria-hidden>{anchor.emoji}</span>
+        )}
+        <span className={cn("font-medium truncate", !anchor.active && "line-through text-muted-foreground")}>
+          {anchor.name}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Reminder bell — only on active anchors */}
+        {anchor.active && (
+          <button
+            onClick={onReminderClick}
+            title={hasReminder ? t.reminder.active : t.reminder.setReminder}
+            className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+              hasReminder
+                ? "text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
+                : "text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted"
+            )}
+            data-testid={`btn-reminder-${anchor.id}`}
+          >
+            {hasReminder ? <BellRing className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+          </button>
+        )}
+
+        <Switch
+          checked={anchor.active}
+          onCheckedChange={(checked) => onToggle(anchor, checked)}
+          data-testid={`switch-anchor-${anchor.id}`}
+        />
+      </div>
     </div>
   );
 }
