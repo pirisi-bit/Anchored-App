@@ -1,0 +1,34 @@
+Here's the map of what lives where — everything under artifacts/ is what you'd edit:
+
+Web app (artifacts/anchored/)
+
+src/pages/ — each screen (dashboard, anchors, proof, settings, onboarding, login)
+src/components/ — reusable pieces (AnchorCard, VoiceSheet, TutorialOverlay, etc.)
+src/lib/ — data layer (Supabase storage, auth, language/i18n)
+src/App.tsx — app shell and routing
+Mobile app (artifacts/mobile/)
+
+app/(tabs)/ — the four tab screens
+app/ — other screens (onboarding, proof detail)
+components/ — shared mobile components
+lib/ — same data layer mirroring the web
+Backend (artifacts/api-server/)
+
+src/routes/ — API endpoints (file uploads, receipts)
+Shared config
+
+pnpm-workspace.yaml — package setup
+supabase/migrations/ — database schema (applied in Supabase dashboard)
+Things you don't need to touch
+
+node_modules/ — not in GitHub (run pnpm install to restore them)
+artifacts/anchored/src/components/ui/ — shadcn auto-generated UI primitives
+.agents/ — Replit agent memory, not app code
+To run it on another machine after cloning:
+
+pnpm install          # restore dependencies
+pnpm --filter @workspace/anchored run dev    # web
+pnpm --filter @workspace/mobile run dev      # mobile
+pnpm --filter @workspace/api-server run dev  # backend
+
+You'll also need to copy over the environment variables (Supabase URL/key, session secret) — those aren't in GitHub for security reasons.
