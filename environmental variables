@@ -1,0 +1,10 @@
+Environmental variables and values i will need to run things?
+From your Replit Secrets panel (padlock icon in the left sidebar):
+
+SESSION_SECRET — copy the value shown there (google auth?)
+SUPABASE_SERVICE_ROLE_KEY — copy the value shown there
+From your Supabase dashboard (project → Settings → API):
+
+VITE_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_URL — your project URL (same value, used by web + mobile)
+VITE_SUPABASE_ANON_KEY / EXPO_PUBLIC_SUPABASE_ANON_KEY — your anon/public key (same value, used by web + mobile)
+When setting up on another machine, create a .env file in the relevant folders with these. Store them somewhere safe like 1Password, Bitwarden, or even a private note — just never commit them to GitHub.
