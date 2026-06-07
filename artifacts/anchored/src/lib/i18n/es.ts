@@ -52,6 +52,8 @@ export const es: Translations = {
   },
   onboarding: {
     title: "¿Qué quieres registrar?",
+    createOwn: "Crear anclaje personalizado",
+    createOwnSub: "Ponle cualquier nombre — elige emoji y color",
     subtitle: "Elige los hábitos y rutinas de los que quieres guardar evidencia.",
     addBtn: (n: number) => n === 1 ? "Agregar 1 anclaje" : `Agregar ${n} anclajes`,
     alreadyAdded: "Ya agregado",

@@ -54,6 +54,8 @@ export const en = {
     addBtn: (n: number) => n === 1 ? "Add 1 anchor" : `Add ${n} anchors`,
     alreadyAdded: "Already added",
     backToDashboard: "Back to dashboard",
+    createOwn: "Create your own anchor",
+    createOwnSub: "Name it anything — pick emoji & color",
   },
   anchorsPage: {
     title: "Manage Anchors",

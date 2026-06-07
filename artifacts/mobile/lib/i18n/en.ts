@@ -57,6 +57,8 @@ export const en = {
     title: "Pick your anchors",
     subtitle: "Choose the routines you want to prove each day. You can change these anytime.",
     alreadyAdded: "(added)",
+    createOwn: "Create your own anchor",
+    createOwnSub: "Name it anything — pick emoji & color",
     addBtn: (n: number) =>
       n > 0
         ? `Add ${n} anchor${n !== 1 ? "s" : ""}`

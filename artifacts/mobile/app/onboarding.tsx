@@ -18,6 +18,7 @@ import { useAnchors } from "@/lib/anchors-context";
 import { useT } from "@/lib/lang-context";
 import { categoryColor, CATEGORY_ORDER, TEMPLATES } from "@/lib/categories";
 import type { Anchor, Category, VerificationMethod } from "@/lib/storage";
+import { CreateAnchorSheet } from "@/components/CreateAnchorSheet";
 
 function defaultMethod(category: Category): VerificationMethod {
   if (category === "Bills & Receipts") return "Receipt";
@@ -39,6 +40,7 @@ export default function OnboardingScreen() {
   const [expanded, setExpanded] = useState<Category | null>(availableCategories[0] ?? null);
   const [selected, setSelected] = useState<Record<string, Category>>({});
   const [saving, setSaving] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
   // Dedup: names already in the user's anchors (lowercased for comparison)
   const existingNames = new Set(anchors.map((a) => a.name.toLowerCase()));
@@ -105,6 +107,32 @@ export default function OnboardingScreen() {
         <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
           {t.onboarding.subtitle}
         </Text>
+
+        <Pressable
+          onPress={() => setCreateOpen(true)}
+          style={({ pressed }) => [
+            styles.createRow,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              marginBottom: 14,
+              opacity: pressed ? 0.8 : 1,
+            },
+          ]}
+        >
+          <View style={[styles.createIcon, { backgroundColor: colors.primary + "1A" }]}>
+            <Feather name="edit-2" size={18} color={colors.primary} />
+          </View>
+          <View style={styles.createText}>
+            <Text style={[styles.createLabel, { color: colors.foreground }]}>
+              {t.onboarding.createOwn}
+            </Text>
+            <Text style={[styles.createSub, { color: colors.mutedForeground }]}>
+              {t.onboarding.createOwnSub}
+            </Text>
+          </View>
+          <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+        </Pressable>
 
         <View style={styles.groups}>
           {availableCategories.map((category) => {
@@ -212,6 +240,8 @@ export default function OnboardingScreen() {
           )}
         </Pressable>
       </View>
+
+      <CreateAnchorSheet visible={createOpen} onClose={() => setCreateOpen(false)} />
     </View>
   );
 }
@@ -239,6 +269,33 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     marginTop: 6,
     marginBottom: 24,
+  },
+  createRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+  },
+  createIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  createText: {
+    flex: 1,
+    gap: 2,
+  },
+  createLabel: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+  },
+  createSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
   },
   groups: { gap: 14 },
   group: {

@@ -4,9 +4,10 @@ import { useAnchors } from "@/lib/anchors-context";
 import { useT } from "@/lib/lang-context";
 import { Category, Anchor } from "@/lib/storage";
 import { CategoryAccordion } from "@/components/CategoryAccordion";
+import { CreateAnchorSheet } from "@/components/CreateAnchorSheet";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Loader2, ChevronLeft } from "lucide-react";
+import { Loader2, ChevronLeft, PenLine } from "lucide-react";
 
 const TEMPLATE_KEYS: Record<Category, string[]> = {
   "Home Safety":      ["Locked front door", "Turned off stove", "Checked windows", "Set alarm", "Turned off iron"],
@@ -34,6 +35,7 @@ export default function Onboarding() {
 
   const [selectedTemplates, setSelectedTemplates] = useState<Selected[]>([]);
   const [saving, setSaving] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
   // Build the set of already-saved anchor names for dedup check.
   const existingNames = new Set(anchors.map((a) => a.name.toLowerCase()));
@@ -115,6 +117,22 @@ export default function Onboarding() {
             alreadyAddedLabel={t.onboarding.alreadyAdded}
           />
         ))}
+
+        {/* Create your own anchor */}
+        <button
+          type="button"
+          onClick={() => setCreateOpen(true)}
+          className="flex items-center gap-3 bg-card rounded-2xl p-4 shadow-sm border w-full text-left hover:bg-muted/50 transition-colors"
+          data-testid="btn-create-custom-onboarding"
+        >
+          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <PenLine className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="font-bold text-sm">{t.onboarding.createOwn}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">{t.onboarding.createOwnSub}</div>
+          </div>
+        </button>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-background/80 backdrop-blur-sm border-t">
@@ -133,6 +151,8 @@ export default function Onboarding() {
           </Button>
         </div>
       </div>
+
+      <CreateAnchorSheet open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
 }

@@ -82,6 +82,8 @@ export const es: Translations = {
     title: "Elige tus anclajes",
     subtitle: "Selecciona las rutinas que quieres demostrar cada día. Puedes cambiarlas cuando quieras.",
     alreadyAdded: "(agregado)",
+    createOwn: "Crear anclaje personalizado",
+    createOwnSub: "Ponle cualquier nombre — elige emoji y color",
     addBtn: (n: number) =>
       n > 0
         ? `Agregar ${n} anclaje${n !== 1 ? "s" : ""}`
