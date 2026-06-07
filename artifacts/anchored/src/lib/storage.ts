@@ -118,7 +118,7 @@ export async function insertAnchors(anchors: Anchor[]): Promise<void> {
     created_at: a.createdAt,
     ...(a.emoji ? { emoji: a.emoji } : {}),
     ...(a.color ? { color: a.color } : {}),
-    reminder: a.reminder ?? null,
+    ...(a.reminder ? { reminder: a.reminder } : {}),
   }));
   const { error } = await supabase.from("anchors").insert(rows);
   if (error) throw error;

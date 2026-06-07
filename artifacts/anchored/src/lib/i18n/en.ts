@@ -53,6 +53,7 @@ export const en = {
     subtitle: "Select the habits and routines you want to build proof for.",
     addBtn: (n: number) => n === 1 ? "Add 1 anchor" : `Add ${n} anchors`,
     alreadyAdded: "Already added",
+    backToDashboard: "Back to dashboard",
   },
   anchorsPage: {
     title: "Manage Anchors",

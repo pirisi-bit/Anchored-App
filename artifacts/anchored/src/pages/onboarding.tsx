@@ -6,7 +6,7 @@ import { Category, Anchor } from "@/lib/storage";
 import { CategoryAccordion } from "@/components/CategoryAccordion";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft } from "lucide-react";
 
 const TEMPLATE_KEYS: Record<Category, string[]> = {
   "Home Safety":      ["Locked front door", "Turned off stove", "Checked windows", "Set alarm", "Turned off iron"],
@@ -73,16 +73,30 @@ export default function Onboarding() {
       await addAnchors(newAnchors);
       setLocation("/dashboard");
     } catch (e) {
+      console.error("Failed to save anchors:", e);
       toast.error(t.errors.couldNotSave);
       setSaving(false);
     }
   };
+
+  const hasExisting = anchors.length > 0;
 
   const addableCount = selectedTemplates.length;
 
   return (
     <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto relative pb-40">
       <div className="px-4 pt-12 pb-6">
+        {hasExisting && (
+          <button
+            type="button"
+            onClick={() => setLocation("/dashboard")}
+            className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4 -ml-1"
+            data-testid="btn-back-dashboard"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            {t.onboarding.backToDashboard}
+          </button>
+        )}
         <h1 className="text-3xl font-extrabold tracking-tight mb-2">{t.onboarding.title}</h1>
         <p className="text-muted-foreground">{t.onboarding.subtitle}</p>
       </div>

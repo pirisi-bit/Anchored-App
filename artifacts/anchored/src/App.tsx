@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
-import { AnchorsProvider } from "@/lib/anchors-context";
+import { AnchorsProvider, useAnchors } from "@/lib/anchors-context";
 import { LangProvider } from "@/lib/lang-context";
 import { BottomNav } from "@/components/BottomNav";
 
@@ -47,6 +47,26 @@ function ProtectedRoute({ component: Component }: { component: ComponentType }) 
   return <Component />;
 }
 
+// Entry gate for "/": logged-out users see the marketing landing; returning
+// users (who already have anchors) go straight to the dashboard; brand-new
+// users go to onboarding to set up their first anchors.
+function Index() {
+  const { user, loading } = useAuth();
+  const { anchors, loading: anchorsLoading } = useAnchors();
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (loading || !user || anchorsLoading) return;
+    setLocation(anchors.length > 0 ? "/dashboard" : "/onboarding", {
+      replace: true,
+    });
+  }, [loading, user, anchorsLoading, anchors.length, setLocation]);
+
+  if (loading) return <LoadingScreen />;
+  if (!user) return <Home />;
+  return <LoadingScreen />;
+}
+
 function Router() {
   const [location] = useLocation();
   const hideNav =
@@ -60,7 +80,7 @@ function Router() {
   return (
     <>
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/" component={Index} />
         <Route path="/login" component={Login} />
         <Route path="/reset-password" component={ResetPassword} />
         <Route path="/privacy" component={Privacy} />

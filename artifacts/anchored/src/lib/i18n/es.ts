@@ -55,6 +55,7 @@ export const es: Translations = {
     subtitle: "Elige los hábitos y rutinas de los que quieres guardar evidencia.",
     addBtn: (n: number) => n === 1 ? "Agregar 1 anclaje" : `Agregar ${n} anclajes`,
     alreadyAdded: "Ya agregado",
+    backToDashboard: "Volver al panel",
   },
   anchorsPage: {
     title: "Mis Anclajes",
