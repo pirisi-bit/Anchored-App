@@ -47,3 +47,9 @@ id = "ZdkPVVeA2sV9F84rzjBg-"
 uri = "file://DEVELOPER_GUIDE.md"
 type = "text"
 title = "Anchored — Developer Handover Guide"
+
+[[outputs]]
+id = "cxxoAkXzfkppFcDkV9JsP"
+uri = "file://artifacts/anchored/supabase/GOOGLE_OAUTH_SETUP.md"
+type = "text"
+title = "Google Sign-In Setup & Recovery Runbook"

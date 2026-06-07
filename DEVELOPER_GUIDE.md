@@ -449,9 +449,14 @@ Netlify — static-only hosting would break the upload API.
 `artifacts/anchored/supabase/AUTH_URL_CONFIG.md`. Check Site URL + allow-list.
 
 **Google sign-in fails**
-→ Confirm the Google provider is **enabled** at the Supabase project level and
-the redirect (`mobile://*` for mobile, the web domain for web) is allow-listed.
-The provider being disabled returns "provider is not enabled" from `/authorize`.
+→ If Google shows **"The OAuth client was deleted / Error 401: deleted_client"**
+(or `invalid_client`), the Google Cloud OAuth client Supabase points at no longer
+exists — recreate it and reconnect it to Supabase. Full step-by-step runbook:
+`artifacts/anchored/supabase/GOOGLE_OAUTH_SETUP.md`.
+→ Otherwise confirm the Google provider is **enabled** at the Supabase project
+level and the redirect (`mobile://*` for mobile, the web domain for web) is
+allow-listed. The provider being disabled returns "provider is not enabled" from
+`/authorize`. Email/password sign-in works regardless of Google config.
 
 **"column/relation does not exist" against Supabase**
 → The migration in `supabase/migrations/` wasn't applied in the Supabase
