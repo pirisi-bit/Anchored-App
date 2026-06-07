@@ -18,12 +18,26 @@ export default function AnchorsPage() {
   const t = useT();
   const [createOpen, setCreateOpen] = useState(false);
   const [reminderAnchor, setReminderAnchor] = useState<Anchor | null>(null);
+  // Optimistic active-state overrides: id → boolean. Applied on top of DB state
+  // so the toggle feels instant even while the network call is in flight.
+  const [activeOverrides, setActiveOverrides] = useState<Record<string, boolean>>({});
 
   const handleToggle = async (anchor: Anchor, checked: boolean) => {
+    // Apply optimistic update immediately
+    setActiveOverrides((prev) => ({ ...prev, [anchor.id]: checked }));
     try {
       await updateAnchorState({ ...anchor, active: checked });
     } catch {
+      // Roll back on failure
+      setActiveOverrides((prev) => ({ ...prev, [anchor.id]: anchor.active }));
       toast.error(t.errors.couldNotUpdate);
+    } finally {
+      // Remove override once the context has refreshed with the real value
+      setActiveOverrides((prev) => {
+        const next = { ...prev };
+        delete next[anchor.id];
+        return next;
+      });
     }
   };
 
@@ -36,8 +50,13 @@ export default function AnchorsPage() {
     }
   };
 
+  // Merge optimistic overrides into the displayed anchor list
+  const displayAnchors = anchors.map((a) =>
+    a.id in activeOverrides ? { ...a, active: activeOverrides[a.id] } : a
+  );
+
   // Group and sort: active first within each category, inactive below
-  const grouped = anchors.reduce((acc, anchor) => {
+  const grouped = displayAnchors.reduce((acc, anchor) => {
     if (!acc[anchor.category]) acc[anchor.category] = [];
     acc[anchor.category].push(anchor);
     return acc;
@@ -178,7 +197,7 @@ function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, t }: AnchorR
         {anchor.emoji && (
           <span className="text-xl shrink-0" aria-hidden>{anchor.emoji}</span>
         )}
-        <span className={cn("font-medium truncate", !anchor.active && "line-through text-muted-foreground")}>
+        <span className="font-medium truncate">
           {anchor.name}
         </span>
       </div>
