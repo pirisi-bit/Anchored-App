@@ -33,3 +33,19 @@ provides the Supabase DB connection string). To check whether a table exists, hi
 `https://<ref>.supabase.co/rest/v1/<table>?select=id&limit=1` with the publishable
 key as both `apikey` and `Bearer`: `404 PGRST205` = table missing, `200 []` = table
 exists and RLS is active (anon sees no rows).
+
+## Auth email links depend on Site URL + Redirect allow-list (not code)
+Supabase emails (signup confirmation, password reset) and OAuth use the project's
+**Site URL** as the default/fallback base, and only honor an explicit `redirectTo`
+if that URL matches the **Redirect URLs allow-list**. The app passing a correct
+`redirectTo` (web uses `window.location.origin`) is NOT enough — if the allow-list
+doesn't include the web domain, Supabase falls back to Site URL. A Site URL left at
+`http://localhost:3000` silently breaks links for real web users.
+
+**How to apply:** change these in Authentication → URL Configuration, or via the
+Management API `PATCH https://api.supabase.com/v1/projects/<ref>/config/auth` with
+`{ site_url, uri_allow_list }` (comma-separated string; wildcards like
+`https://<domain>/**` work). Needs an **account-level** access token (`sbp_…`) —
+the project's `service_role` / `SUPABASE_SERVICE_ROLE_KEY` does NOT work for the
+Management API. Preserve existing entries (e.g. `mobile://,mobile://*`) when patching.
+After deploying the web app, update Site URL from the dev domain to the published one.
