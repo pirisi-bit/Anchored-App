@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import { useAnchors } from "@/lib/anchors-context";
 import { useT } from "@/lib/lang-context";
 import { PREDEFINED_CATEGORIES } from "@/lib/storage";
-import { supabase } from "@/lib/supabase-client";
 import { cn } from "@/lib/utils";
+
+const PREDEFINED_SET = new Set<string>(PREDEFINED_CATEGORIES);
 
 const EMOJIS = [
   "🏠","🔒","🍳","🪟","🚨","🔌",
@@ -37,7 +38,7 @@ interface CreateAnchorSheetProps {
 
 export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps) {
   const t = useT();
-  const { addAnchors } = useAnchors();
+  const { addAnchors, anchors } = useAnchors();
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Other");
@@ -45,21 +46,31 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
   const [color, setColor] = useState("sage");
   const [saving, setSaving] = useState(false);
 
-  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  // Categories the user has already created (derived from saved anchors, no extra API call).
+  const derivedCustomCategories = useMemo(() => {
+    const seen = new Set<string>();
+    const result: string[] = [];
+    for (const anchor of anchors) {
+      if (!PREDEFINED_SET.has(anchor.category) && !seen.has(anchor.category)) {
+        seen.add(anchor.category);
+        result.push(anchor.category);
+      }
+    }
+    return result;
+  }, [anchors]);
+
+  // Categories typed in this session but not yet saved (disappear on close without saving).
+  const [pendingCategories, setPendingCategories] = useState<string[]>([]);
   const [showNewCat, setShowNewCat] = useState(false);
   const [newCatInput, setNewCatInput] = useState("");
-  const [addingCat, setAddingCat] = useState(false);
 
-  // Load the user's saved custom categories whenever the sheet opens.
-  useEffect(() => {
-    if (!open) return;
-    supabase.auth.getUser().then(({ data }) => {
-      const cats = (data.user?.user_metadata?.custom_categories as string[]) ?? [];
-      setCustomCategories(cats);
-    });
-  }, [open]);
-
-  const allCategories = [...PREDEFINED_CATEGORIES, ...customCategories];
+  const allCategories = [
+    ...PREDEFINED_CATEGORIES,
+    ...derivedCustomCategories,
+    ...pendingCategories.filter(
+      (c) => !PREDEFINED_SET.has(c) && !derivedCustomCategories.includes(c)
+    ),
+  ];
 
   const reset = () => {
     setName("");
@@ -67,9 +78,9 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
     setEmoji("📌");
     setColor("sage");
     setSaving(false);
+    setPendingCategories([]);
     setShowNewCat(false);
     setNewCatInput("");
-    setAddingCat(false);
   };
 
   const handleClose = (next: boolean) => {
@@ -77,7 +88,7 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
     onOpenChange(next);
   };
 
-  const handleAddCategory = async () => {
+  const handleAddCategory = () => {
     const trimmed = newCatInput.trim();
     if (!trimmed) return;
     const lower = trimmed.toLowerCase();
@@ -88,16 +99,10 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
       setNewCatInput("");
       return;
     }
-    setAddingCat(true);
-    const updated = [...customCategories, trimmed];
-    const { error } = await supabase.auth.updateUser({ data: { custom_categories: updated } });
-    setAddingCat(false);
-    if (!error) {
-      setCustomCategories(updated);
-      setCategory(trimmed);
-      setShowNewCat(false);
-      setNewCatInput("");
-    }
+    setPendingCategories((prev) => [...prev, trimmed]);
+    setCategory(trimmed);
+    setShowNewCat(false);
+    setNewCatInput("");
   };
 
   const handleSave = async () => {
@@ -198,12 +203,10 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
                   <Button
                     size="sm"
                     onClick={handleAddCategory}
-                    disabled={addingCat || !newCatInput.trim()}
+                    disabled={!newCatInput.trim()}
                     className="rounded-xl h-9 px-3 text-xs shrink-0"
                   >
-                    {addingCat
-                      ? <Loader2 className="w-3 h-3 animate-spin" />
-                      : t.createAnchor.addCategory}
+                    {t.createAnchor.addCategory}
                   </Button>
                   <Button
                     size="sm"

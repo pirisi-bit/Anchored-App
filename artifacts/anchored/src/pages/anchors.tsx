@@ -184,7 +184,13 @@ function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, t }: AnchorR
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        {/* Reminder bell — only on active anchors */}
+        <Switch
+          checked={anchor.active}
+          onCheckedChange={(checked) => onToggle(anchor, checked)}
+          data-testid={`switch-anchor-${anchor.id}`}
+        />
+
+        {/* Reminder bell — only on active anchors; sits to the right of the toggle */}
         {anchor.active && (
           <button
             onClick={onReminderClick}
@@ -200,12 +206,6 @@ function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, t }: AnchorR
             {hasReminder ? <BellRing className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
           </button>
         )}
-
-        <Switch
-          checked={anchor.active}
-          onCheckedChange={(checked) => onToggle(anchor, checked)}
-          data-testid={`switch-anchor-${anchor.id}`}
-        />
       </div>
     </div>
   );

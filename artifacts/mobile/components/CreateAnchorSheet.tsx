@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
   Modal,
   View,
@@ -18,8 +18,9 @@ import * as Crypto from "expo-crypto";
 import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
 import { useT } from "@/lib/lang-context";
-import { supabase } from "@/lib/supabase";
 import { PREDEFINED_CATEGORIES } from "@/lib/storage";
+
+const PREDEFINED_SET = new Set<string>(PREDEFINED_CATEGORIES);
 
 const EMOJIS = [
   "🏠","🔒","🍳","🪟","🚨","🔌",
@@ -50,7 +51,7 @@ export function CreateAnchorSheet({ visible, onClose }: CreateAnchorSheetProps) 
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const t = useT();
-  const { addAnchors } = useAnchors();
+  const { addAnchors, anchors } = useAnchors();
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Other");
@@ -58,20 +59,31 @@ export function CreateAnchorSheet({ visible, onClose }: CreateAnchorSheetProps) 
   const [color, setColor] = useState("sage");
   const [saving, setSaving] = useState(false);
 
-  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  // Derive custom categories from saved anchors — no extra API call needed.
+  const derivedCustomCategories = useMemo(() => {
+    const seen = new Set<string>();
+    const result: string[] = [];
+    for (const anchor of anchors) {
+      if (!PREDEFINED_SET.has(anchor.category) && !seen.has(anchor.category)) {
+        seen.add(anchor.category);
+        result.push(anchor.category);
+      }
+    }
+    return result;
+  }, [anchors]);
+
+  // Categories typed in this session before saving.
+  const [pendingCategories, setPendingCategories] = useState<string[]>([]);
   const [showNewCat, setShowNewCat] = useState(false);
   const [newCatInput, setNewCatInput] = useState("");
-  const [addingCat, setAddingCat] = useState(false);
 
-  useEffect(() => {
-    if (!visible) return;
-    supabase.auth.getUser().then(({ data }) => {
-      const cats = (data.user?.user_metadata?.custom_categories as string[]) ?? [];
-      setCustomCategories(cats);
-    });
-  }, [visible]);
-
-  const allCategories = [...PREDEFINED_CATEGORIES, ...customCategories];
+  const allCategories = [
+    ...PREDEFINED_CATEGORIES,
+    ...derivedCustomCategories,
+    ...pendingCategories.filter(
+      (c) => !PREDEFINED_SET.has(c) && !derivedCustomCategories.includes(c)
+    ),
+  ];
 
   const reset = () => {
     setName("");
@@ -79,9 +91,9 @@ export function CreateAnchorSheet({ visible, onClose }: CreateAnchorSheetProps) 
     setEmoji("📌");
     setColor("sage");
     setSaving(false);
+    setPendingCategories([]);
     setShowNewCat(false);
     setNewCatInput("");
-    setAddingCat(false);
   };
 
   const handleClose = () => {
@@ -89,7 +101,7 @@ export function CreateAnchorSheet({ visible, onClose }: CreateAnchorSheetProps) 
     onClose();
   };
 
-  const handleAddCategory = async () => {
+  const handleAddCategory = () => {
     const trimmed = newCatInput.trim();
     if (!trimmed) return;
     const lower = trimmed.toLowerCase();
@@ -100,16 +112,10 @@ export function CreateAnchorSheet({ visible, onClose }: CreateAnchorSheetProps) 
       setNewCatInput("");
       return;
     }
-    setAddingCat(true);
-    const updated = [...customCategories, trimmed];
-    const { error } = await supabase.auth.updateUser({ data: { custom_categories: updated } });
-    setAddingCat(false);
-    if (!error) {
-      setCustomCategories(updated);
-      setCategory(trimmed);
-      setShowNewCat(false);
-      setNewCatInput("");
-    }
+    setPendingCategories((prev) => [...prev, trimmed]);
+    setCategory(trimmed);
+    setShowNewCat(false);
+    setNewCatInput("");
   };
 
   const handleSave = async () => {
@@ -261,16 +267,16 @@ export function CreateAnchorSheet({ visible, onClose }: CreateAnchorSheetProps) 
                     />
                     <Pressable
                       onPress={handleAddCategory}
-                      disabled={addingCat || !newCatInput.trim()}
-                      style={[styles.addCatBtn, { backgroundColor: colors.primary }]}
+                      disabled={!newCatInput.trim()}
+                      style={[
+                        styles.addCatBtn,
+                        { backgroundColor: colors.primary },
+                        !newCatInput.trim() && { opacity: 0.5 },
+                      ]}
                     >
-                      {addingCat ? (
-                        <ActivityIndicator size="small" color={colors.primaryForeground} />
-                      ) : (
-                        <Text style={[styles.addCatText, { color: colors.primaryForeground }]}>
-                          {t.createAnchor.addCategory}
-                        </Text>
-                      )}
+                      <Text style={[styles.addCatText, { color: colors.primaryForeground }]}>
+                        {t.createAnchor.addCategory}
+                      </Text>
                     </Pressable>
                     <Pressable
                       onPress={() => { setShowNewCat(false); setNewCatInput(""); }}

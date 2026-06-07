@@ -108,32 +108,6 @@ export default function OnboardingScreen() {
           {t.onboarding.subtitle}
         </Text>
 
-        <Pressable
-          onPress={() => setCreateOpen(true)}
-          style={({ pressed }) => [
-            styles.createRow,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              marginBottom: 14,
-              opacity: pressed ? 0.8 : 1,
-            },
-          ]}
-        >
-          <View style={[styles.createIcon, { backgroundColor: colors.primary + "1A" }]}>
-            <Feather name="edit-2" size={18} color={colors.primary} />
-          </View>
-          <View style={styles.createText}>
-            <Text style={[styles.createLabel, { color: colors.foreground }]}>
-              {t.onboarding.createOwn}
-            </Text>
-            <Text style={[styles.createSub, { color: colors.mutedForeground }]}>
-              {t.onboarding.createOwnSub}
-            </Text>
-          </View>
-          <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
-        </Pressable>
-
         <View style={styles.groups}>
           {availableCategories.map((category) => {
             const isOpen = expanded === category;
@@ -211,6 +185,32 @@ export default function OnboardingScreen() {
             );
           })}
         </View>
+
+        {/* Create your own anchor — appears after the template categories */}
+        <Pressable
+          onPress={() => setCreateOpen(true)}
+          style={({ pressed }) => [
+            styles.createRow,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              opacity: pressed ? 0.8 : 1,
+            },
+          ]}
+        >
+          <View style={[styles.createIcon, { backgroundColor: colors.primary + "1A" }]}>
+            <Feather name="edit-2" size={18} color={colors.primary} />
+          </View>
+          <View style={styles.createText}>
+            <Text style={[styles.createLabel, { color: colors.foreground }]}>
+              {t.onboarding.createOwn}
+            </Text>
+            <Text style={[styles.createSub, { color: colors.mutedForeground }]}>
+              {t.onboarding.createOwnSub}
+            </Text>
+          </View>
+          <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+        </Pressable>
       </ScrollView>
 
       <View
