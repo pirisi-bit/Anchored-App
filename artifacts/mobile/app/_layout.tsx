@@ -10,7 +10,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import * as SystemUI from "expo-system-ui";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -18,9 +18,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
-import { AnchorsProvider } from "@/lib/anchors-context";
+import { AnchorsProvider, useAnchors } from "@/lib/anchors-context";
 import { RemindersProvider } from "@/lib/reminders-context";
 import {
+  getReminderAnchorId,
   isDailyReminderResponse,
   notificationsSupported,
 } from "@/lib/notifications";
@@ -48,9 +49,12 @@ function LoadingScreen() {
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
+  const { anchors, proofs, todayKey, loading: anchorsLoading } = useAnchors();
   const segments = useSegments();
   const router = useRouter();
   const handledColdStartResponse = useRef(false);
+  const [pendingResponse, setPendingResponse] =
+    useState<Notifications.NotificationResponse | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -66,25 +70,53 @@ function RootLayoutNav() {
     if (!notificationsSupported()) return;
     if (loading || !user) return;
 
-    const goToDashboard = (
-      response: Notifications.NotificationResponse | null,
-    ) => {
-      if (isDailyReminderResponse(response)) {
-        router.replace("/(tabs)");
-      }
-    };
-
     if (!handledColdStartResponse.current) {
       handledColdStartResponse.current = true;
       Notifications.getLastNotificationResponseAsync()
-        .then(goToDashboard)
+        .then((response) => {
+          if (response) setPendingResponse(response);
+        })
         .catch(() => {});
     }
 
-    const subscription =
-      Notifications.addNotificationResponseReceivedListener(goToDashboard);
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => setPendingResponse(response),
+    );
     return () => subscription.remove();
-  }, [user, loading, router]);
+  }, [user, loading]);
+
+  const routeFromReminder = useCallback(
+    (response: Notifications.NotificationResponse) => {
+      if (!isDailyReminderResponse(response)) return;
+      const anchorId = getReminderAnchorId(response);
+      const stillOutstanding =
+        !!anchorId &&
+        anchors.some(
+          (a) =>
+            a.id === anchorId &&
+            a.active &&
+            !proofs.some(
+              (p) => p.anchorId === anchorId && p.dateKey === todayKey,
+            ),
+        );
+      if (stillOutstanding) {
+        router.replace({
+          pathname: "/(tabs)",
+          params: { focusAnchor: anchorId, focusKey: String(Date.now()) },
+        });
+      } else {
+        router.replace("/(tabs)");
+      }
+    },
+    [anchors, proofs, todayKey, router],
+  );
+
+  useEffect(() => {
+    if (!pendingResponse) return;
+    if (loading || !user || anchorsLoading) return;
+    routeFromReminder(pendingResponse);
+    setPendingResponse(null);
+  }, [pendingResponse, loading, user, anchorsLoading, routeFromReminder]);
 
   if (loading) return <LoadingScreen />;
 

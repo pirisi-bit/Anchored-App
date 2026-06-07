@@ -9,6 +9,7 @@ import { StatusBadge } from "./StatusBadge";
 interface AnchorCardProps {
   anchor: Anchor;
   proof?: Proof;
+  highlighted?: boolean;
   onSelfConfirm: () => void;
   onPhoto: () => void;
   onReceipt: () => void;
@@ -63,6 +64,7 @@ function ActionButton({
 export function AnchorCard({
   anchor,
   proof,
+  highlighted,
   onSelfConfirm,
   onPhoto,
   onReceipt,
@@ -76,6 +78,14 @@ export function AnchorCard({
       style={[
         styles.card,
         { backgroundColor: colors.card, borderColor: colors.border },
+        highlighted && {
+          borderColor: colors.primary,
+          borderWidth: 2,
+          shadowColor: colors.primary,
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
+          elevation: 4,
+        },
       ]}
     >
       <View style={styles.topRow}>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
@@ -29,6 +29,10 @@ export default function DashboardScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { focusAnchor, focusKey } = useLocalSearchParams<{
+    focusAnchor?: string;
+    focusKey?: string;
+  }>();
   const {
     anchors,
     loading,
@@ -44,11 +48,46 @@ export default function DashboardScreen() {
     mode: CaptureMode;
   } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+
+  const scrollRef = useRef<ScrollView>(null);
+  const cardOffsets = useRef<Record<string, number>>({});
+  const handledFocus = useRef<string | null>(null);
 
   const activeAnchors = useMemo(
     () => anchors.filter((a) => a.active),
     [anchors],
   );
+
+  useEffect(() => {
+    if (loading) return;
+    if (!focusAnchor) return;
+    const focusToken = `${focusAnchor}:${focusKey ?? ""}`;
+    if (handledFocus.current === focusToken) return;
+
+    const target = activeAnchors.find(
+      (a) => a.id === focusAnchor && !getTodayProof(a.id),
+    );
+    if (!target) {
+      handledFocus.current = focusToken;
+      return;
+    }
+    handledFocus.current = focusToken;
+
+    const scrollToCard = () => {
+      const y = cardOffsets.current[focusAnchor];
+      if (typeof y === "number") {
+        scrollRef.current?.scrollTo({ y: Math.max(y - 12, 0), animated: true });
+      }
+    };
+    const scrollTimer = setTimeout(scrollToCard, 350);
+    setHighlightId(focusAnchor);
+    const clearTimer = setTimeout(() => setHighlightId(null), 2600);
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [focusAnchor, focusKey, loading, activeAnchors, getTodayProof]);
 
   const doneCount = useMemo(
     () => activeAnchors.filter((a) => getTodayProof(a.id)).length,
@@ -80,6 +119,7 @@ export default function DashboardScreen() {
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={[styles.content, { paddingTop: topPad }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -143,17 +183,25 @@ export default function DashboardScreen() {
                 {activeAnchors.map((anchor) => {
                   const proof = getTodayProof(anchor.id);
                   return (
-                    <AnchorCard
+                    <View
                       key={anchor.id}
-                      anchor={anchor}
-                      proof={proof}
-                      onSelfConfirm={() => selfConfirm(anchor.id)}
-                      onPhoto={() => setCapture({ anchor, mode: "photo" })}
-                      onReceipt={() => setCapture({ anchor, mode: "receipt" })}
-                      onViewProof={() =>
-                        proof && router.push(`/proof/${proof.id}`)
-                      }
-                    />
+                      onLayout={(e) => {
+                        cardOffsets.current[anchor.id] =
+                          e.nativeEvent.layout.y;
+                      }}
+                    >
+                      <AnchorCard
+                        anchor={anchor}
+                        proof={proof}
+                        highlighted={highlightId === anchor.id}
+                        onSelfConfirm={() => selfConfirm(anchor.id)}
+                        onPhoto={() => setCapture({ anchor, mode: "photo" })}
+                        onReceipt={() => setCapture({ anchor, mode: "receipt" })}
+                        onViewProof={() =>
+                          proof && router.push(`/proof/${proof.id}`)
+                        }
+                      />
+                    </View>
                   );
                 })}
               </View>

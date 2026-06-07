@@ -12,6 +12,16 @@ export function isDailyReminderResponse(
   return data?.type === REMINDER_NOTIFICATION_TYPE;
 }
 
+export function getReminderAnchorId(
+  response: Notifications.NotificationResponse | null | undefined,
+): string | null {
+  const data =
+    response?.notification?.request?.content?.data ?? undefined;
+  if (data?.type !== REMINDER_NOTIFICATION_TYPE) return null;
+  const anchorId = data?.anchorId;
+  return typeof anchorId === "string" && anchorId.length > 0 ? anchorId : null;
+}
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowBanner: true,
@@ -45,6 +55,7 @@ export async function scheduleDailyReminder(
   hour: number,
   minute: number,
   body: string,
+  anchorId?: string | null,
 ): Promise<void> {
   if (!notificationsSupported()) return;
   await cancelDailyReminder();
@@ -53,7 +64,10 @@ export async function scheduleDailyReminder(
     content: {
       title: "Time to anchor your day",
       body,
-      data: { type: REMINDER_NOTIFICATION_TYPE },
+      data: {
+        type: REMINDER_NOTIFICATION_TYPE,
+        ...(anchorId ? { anchorId } : {}),
+      },
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,

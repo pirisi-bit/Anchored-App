@@ -86,6 +86,18 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
   const remainingRef = useRef(remaining);
   remainingRef.current = remaining;
 
+  const urgentAnchorId =
+    anchors.find(
+      (a) =>
+        a.active &&
+        !proofs.some(
+          (p) => p.anchorId === a.id && p.dateKey === todayKey,
+        ),
+    )?.id ?? null;
+
+  const urgentAnchorIdRef = useRef(urgentAnchorId);
+  urgentAnchorIdRef.current = urgentAnchorId;
+
   const setEnabled = useCallback(
     async (next: boolean): Promise<boolean> => {
       if (busy) return enabled;
@@ -96,7 +108,12 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
           if (!granted) {
             return false;
           }
-          await scheduleDailyReminder(hour, minute, buildBody(remainingRef.current));
+          await scheduleDailyReminder(
+            hour,
+            minute,
+            buildBody(remainingRef.current),
+            urgentAnchorIdRef.current,
+          );
         } else {
           await cancelDailyReminder();
         }
@@ -123,6 +140,7 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
           nextHour,
           nextMinute,
           buildBody(remainingRef.current),
+          urgentAnchorIdRef.current,
         );
       }
     },
@@ -131,8 +149,8 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!loaded || !enabled) return;
-    scheduleDailyReminder(hour, minute, buildBody(remaining));
-  }, [loaded, enabled, hour, minute, remaining]);
+    scheduleDailyReminder(hour, minute, buildBody(remaining), urgentAnchorId);
+  }, [loaded, enabled, hour, minute, remaining, urgentAnchorId]);
 
   return (
     <RemindersContext.Provider
