@@ -212,6 +212,16 @@ export async function deleteProofById(id: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function deleteAnchor(id: string): Promise<void> {
+  const userId = await currentUserId();
+  const { error } = await supabase
+    .from("anchors")
+    .delete()
+    .eq("user_id", userId)
+    .eq("id", id);
+  if (error) throw error;
+}
+
 export async function clearData(): Promise<void> {
   const userId = await currentUserId();
   const proofsResult = await supabase.from("proofs").delete().eq("user_id", userId);

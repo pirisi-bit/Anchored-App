@@ -9,6 +9,7 @@ import {
   updateAnchor,
   setAnchorActive,
   setAnchorReminder,
+  deleteAnchor as storageDeleteAnchor,
   insertProof,
   deleteProofById,
   getTodayKey,
@@ -24,6 +25,7 @@ interface AnchorsContextType {
   addAnchors: (newAnchors: Anchor[]) => Promise<void>;
   updateAnchorState: (anchor: Anchor) => Promise<void>;
   toggleAnchorActive: (id: string, active: boolean) => Promise<void>;
+  deleteAnchor: (id: string) => Promise<void>;
   saveAnchorReminder: (id: string, reminder: AnchorReminder | null) => Promise<void>;
   selfConfirm: (anchorId: string) => Promise<void>;
   addPhotoProof: (anchorId: string, photoUrl: string) => Promise<void>;
@@ -113,6 +115,11 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
   // `reminder` column (pre-migration) never causes the update to fail.
   const toggleAnchorActive = async (id: string, active: boolean) => {
     await setAnchorActive(id, active);
+    await silentRefresh();
+  };
+
+  const deleteAnchor = async (id: string) => {
+    await storageDeleteAnchor(id);
     await silentRefresh();
   };
 
@@ -214,6 +221,7 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
         addAnchors,
         updateAnchorState,
         toggleAnchorActive,
+        deleteAnchor,
         saveAnchorReminder,
         selfConfirm,
         addPhotoProof,

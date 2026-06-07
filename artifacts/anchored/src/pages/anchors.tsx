@@ -8,13 +8,13 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { CreateAnchorSheet } from "@/components/CreateAnchorSheet";
 import { AnchorReminderSheet } from "@/components/AnchorReminderSheet";
-import { Plus, Loader2, PenLine, Bell, BellRing } from "lucide-react";
+import { Plus, Loader2, PenLine, Bell, BellRing, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export default function AnchorsPage() {
   const [, setLocation] = useLocation();
-  const { anchors, loading, toggleAnchorActive, saveAnchorReminder } = useAnchors();
+  const { anchors, loading, toggleAnchorActive, deleteAnchor, saveAnchorReminder } = useAnchors();
   const t = useT();
   const [createOpen, setCreateOpen] = useState(false);
   const [reminderAnchor, setReminderAnchor] = useState<Anchor | null>(null);
@@ -35,6 +35,18 @@ export default function AnchorsPage() {
         delete next[anchor.id];
         return next;
       });
+    }
+  };
+
+  const handleDelete = async (anchor: Anchor) => {
+    const confirmed = window.confirm(
+      `Remove "${anchor.name}"? This cannot be undone.`
+    );
+    if (!confirmed) return;
+    try {
+      await deleteAnchor(anchor.id);
+    } catch {
+      toast.error(t.errors.couldNotUpdate);
     }
   };
 
@@ -115,6 +127,7 @@ export default function AnchorsPage() {
                       showBorder={i !== activeList.length - 1 || inactiveList.length > 0}
                       onToggle={handleToggle}
                       onReminderClick={() => setReminderAnchor(anchor)}
+                      onDelete={handleDelete}
                       t={t}
                     />
                   ))}
@@ -138,6 +151,7 @@ export default function AnchorsPage() {
                       showBorder={i !== inactiveList.length - 1}
                       onToggle={handleToggle}
                       onReminderClick={() => setReminderAnchor(anchor)}
+                      onDelete={handleDelete}
                       t={t}
                     />
                   ))}
@@ -177,10 +191,11 @@ interface AnchorRowProps {
   showBorder: boolean;
   onToggle: (anchor: Anchor, checked: boolean) => void;
   onReminderClick: () => void;
+  onDelete: (anchor: Anchor) => void;
   t: ReturnType<typeof useT>;
 }
 
-function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, t }: AnchorRowProps) {
+function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, onDelete, t }: AnchorRowProps) {
   const hasReminder = !!anchor.reminder?.enabled;
   return (
     <div
@@ -206,7 +221,7 @@ function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, t }: AnchorR
           data-testid={`switch-anchor-${anchor.id}`}
         />
 
-        {/* Reminder bell — only on active anchors; sits to the right of the toggle */}
+        {/* Reminder bell — only on active anchors */}
         {anchor.active && (
           <button
             onClick={onReminderClick}
@@ -222,6 +237,19 @@ function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, t }: AnchorR
             {hasReminder ? <BellRing className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
           </button>
         )}
+
+        {/* Delete — visible on hover/focus; always visible on inactive anchors */}
+        <button
+          onClick={() => onDelete(anchor)}
+          title="Remove anchor"
+          className={cn(
+            "w-8 h-8 rounded-full flex items-center justify-center transition-colors text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10",
+            !anchor.active && "text-muted-foreground/60"
+          )}
+          data-testid={`btn-delete-anchor-${anchor.id}`}
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
       </div>
     </div>
   );

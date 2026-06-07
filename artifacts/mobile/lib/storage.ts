@@ -133,6 +133,11 @@ export async function updateAnchor(anchor: Anchor): Promise<void> {
   if (error) throw error;
 }
 
+export async function deleteAnchor(id: string): Promise<void> {
+  const { error } = await supabase.from("anchors").delete().eq("id", id);
+  if (error) throw error;
+}
+
 // Targeted single-column updates — toggling never touches unrelated columns.
 export async function setAnchorActive(id: string, active: boolean): Promise<void> {
   const { error } = await supabase

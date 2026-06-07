@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -25,11 +25,14 @@ export default function AnchorsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const t = useT();
-  const { anchors, loading, toggleAnchorActive } = useAnchors();
+  const { anchors, loading, toggleAnchorActive, deleteAnchor } = useAnchors();
   const [createOpen, setCreateOpen] = useState(false);
   // Optimistic overrides: id → boolean. Applied on top of DB state so the
   // switch responds instantly even while the network call is in flight.
   const [activeOverrides, setActiveOverrides] = useState<Record<string, boolean>>({});
+  // Ref-based guard: iOS Switch can fire onValueChange twice on the same tap.
+  // Storing in a ref (not state) avoids triggering a re-render just for the guard.
+  const pendingRef = useRef(new Set<string>());
 
   // Merge optimistic overrides into the displayed list.
   const displayAnchors = useMemo(
@@ -60,6 +63,9 @@ export default function AnchorsScreen() {
   const topPad = insets.top + (Platform.OS === "web" ? 67 : 0) + 8;
 
   const handleToggle = async (anchor: Anchor, active: boolean) => {
+    // Guard against iOS Switch firing onValueChange twice on the same tap.
+    if (pendingRef.current.has(anchor.id)) return;
+    pendingRef.current.add(anchor.id);
     setActiveOverrides((prev) => ({ ...prev, [anchor.id]: active }));
     try {
       await toggleAnchorActive(anchor.id, active);
@@ -67,12 +73,34 @@ export default function AnchorsScreen() {
       setActiveOverrides((prev) => ({ ...prev, [anchor.id]: anchor.active }));
       Alert.alert(t.anchors.couldNotUpdate, t.anchors.tryAgain);
     } finally {
+      pendingRef.current.delete(anchor.id);
       setActiveOverrides((prev) => {
         const next = { ...prev };
         delete next[anchor.id];
         return next;
       });
     }
+  };
+
+  const handleDelete = (anchor: Anchor) => {
+    Alert.alert(
+      "Remove anchor",
+      `Remove "${anchor.name}"? This cannot be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteAnchor(anchor.id);
+            } catch {
+              Alert.alert(t.anchors.couldNotUpdate, t.anchors.tryAgain);
+            }
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -175,6 +203,13 @@ export default function AnchorsScreen() {
                           trackColor={{ false: colors.muted, true: colors.primary }}
                           thumbColor="#FFFFFF"
                         />
+                        <Pressable
+                          onPress={() => handleDelete(anchor)}
+                          hitSlop={8}
+                          style={({ pressed }) => ({ opacity: pressed ? 0.5 : 0.3 })}
+                        >
+                          <Feather name="trash-2" size={15} color={colors.mutedForeground} />
+                        </Pressable>
                       </View>
                     ))}
 
@@ -225,6 +260,13 @@ export default function AnchorsScreen() {
                           trackColor={{ false: colors.muted, true: colors.primary }}
                           thumbColor="#FFFFFF"
                         />
+                        <Pressable
+                          onPress={() => handleDelete(anchor)}
+                          hitSlop={8}
+                          style={({ pressed }) => ({ opacity: pressed ? 0.5 : 0.6 })}
+                        >
+                          <Feather name="trash-2" size={15} color={colors.mutedForeground} />
+                        </Pressable>
                       </View>
                     ))}
                   </View>
