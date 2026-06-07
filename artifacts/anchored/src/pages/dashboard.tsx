@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAnchors } from "@/lib/anchors-context";
+import { useT } from "@/lib/lang-context";
 import { AnchorCard } from "@/components/AnchorCard";
 import { PhotoSheet } from "@/components/PhotoSheet";
 import { ReceiptSheet } from "@/components/ReceiptSheet";
@@ -13,17 +14,16 @@ import { Anchor } from "@/lib/storage";
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { anchors, loading, selfConfirm, addPhotoProof, addReceiptProof, resetProof, getTodayProof } = useAnchors();
+  const t = useT();
   const [activeAnchorForPhoto, setActiveAnchorForPhoto] = useState<Anchor | null>(null);
   const [activeAnchorForReceipt, setActiveAnchorForReceipt] = useState<Anchor | null>(null);
 
-  // Deactivated anchors never appear on the dashboard.
   const activeAnchors = anchors.filter(a => a.active);
   const completedCount = activeAnchors.filter(a => getTodayProof(a.id)).length;
   const pendingCount = activeAnchors.length - completedCount;
   const progressPercent = activeAnchors.length > 0 ? (completedCount / activeAnchors.length) * 100 : 0;
   const allDone = activeAnchors.length > 0 && completedCount === activeAnchors.length;
 
-  // Show the ones still needing proof first, verified ones (with Reset) below.
   const sortedAnchors = [...activeAnchors].sort((a, b) => {
     const aDone = getTodayProof(a.id) ? 1 : 0;
     const bDone = getTodayProof(b.id) ? 1 : 0;
@@ -33,9 +33,9 @@ export default function Dashboard() {
   const handleReset = async (anchorId: string) => {
     try {
       await resetProof(anchorId);
-      toast.success("Reset. You can verify it again.");
+      toast.success(t.success.proofReset);
     } catch (e) {
-      toast.error("Could not reset. Please try again.");
+      toast.error(t.errors.couldNotReset);
     }
   };
 
@@ -44,7 +44,7 @@ export default function Dashboard() {
       await selfConfirm(anchorId);
       toast.success("Future You has proof. ✓");
     } catch (e) {
-      toast.error("Could not save. Please try again.");
+      toast.error(t.errors.couldNotSave);
     }
   };
 
@@ -56,7 +56,7 @@ export default function Dashboard() {
         await addPhotoProof(anchorId, photoUrl);
         toast.success("Proof saved. ✓");
       } catch (e) {
-        toast.error("Could not save proof. Please try again.");
+        toast.error(t.errors.couldNotSave);
       }
     }
   };
@@ -69,7 +69,7 @@ export default function Dashboard() {
         await addReceiptProof(anchorId, receiptUrl);
         toast.success("Receipt saved. ✓");
       } catch (e) {
-        toast.error("Could not save receipt. Please try again.");
+        toast.error(t.errors.couldNotSave);
       }
     }
   };
@@ -78,24 +78,26 @@ export default function Dashboard() {
     <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-36 px-4 pt-8">
       <header className="mb-6">
         <h2 className="text-muted-foreground font-medium mb-1 text-sm">{format(new Date(), "EEEE, MMMM d")}</h2>
-        <h1 className="text-3xl font-extrabold tracking-tight">Anchored</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">{t.dashboard.title}</h1>
       </header>
 
       <div className="bg-card rounded-3xl p-6 shadow-sm border mb-8 flex flex-col items-center">
-        <h3 className="font-bold text-lg mb-3 text-center">{completedCount} of {activeAnchors.length} anchors verified today</h3>
+        <h3 className="font-bold text-lg mb-3 text-center">
+          {t.dashboard.verifiedOf(completedCount, activeAnchors.length)}
+        </h3>
         <Progress value={progressPercent} className="h-3 w-full mb-4" />
         <div className="grid grid-cols-2 gap-3 w-full">
           <div className="rounded-2xl bg-brand-sage/10 py-3 flex flex-col items-center" data-testid="stat-verified">
             <span className="text-2xl font-extrabold text-brand-sage leading-none">{completedCount}</span>
-            <span className="text-xs font-medium text-muted-foreground mt-1">Verified</span>
+            <span className="text-xs font-medium text-muted-foreground mt-1">{t.dashboard.verified}</span>
           </div>
           <div className="rounded-2xl bg-muted py-3 flex flex-col items-center" data-testid="stat-pending">
             <span className="text-2xl font-extrabold leading-none">{pendingCount}</span>
-            <span className="text-xs font-medium text-muted-foreground mt-1">Pending</span>
+            <span className="text-xs font-medium text-muted-foreground mt-1">{t.dashboard.pending}</span>
           </div>
         </div>
         {allDone && (
-          <p className="text-brand-sage text-sm font-semibold mt-4">All done for today! 🎉</p>
+          <p className="text-brand-sage text-sm font-semibold mt-4">{t.dashboard.allDone}</p>
         )}
       </div>
 
@@ -106,8 +108,10 @@ export default function Dashboard() {
           </div>
         ) : activeAnchors.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <p className="mb-4">No active anchors.</p>
-            <button className="text-primary font-medium underline" onClick={() => setLocation("/onboarding")}>Add some anchors</button>
+            <p className="mb-4">{t.dashboard.noAnchors}</p>
+            <button className="text-primary font-medium underline" onClick={() => setLocation("/onboarding")}>
+              {t.dashboard.addAnchors}
+            </button>
           </div>
         ) : (
           sortedAnchors.map(anchor => {

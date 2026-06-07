@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { AnchorsProvider } from "@/lib/anchors-context";
+import { LangProvider } from "@/lib/lang-context";
 import { BottomNav } from "@/components/BottomNav";
 
 import NotFound from "@/pages/not-found";
@@ -92,6 +93,7 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <LangProvider>
       <AuthProvider>
         <AnchorsProvider>
           <TooltipProvider>
@@ -102,6 +104,7 @@ function App() {
           </TooltipProvider>
         </AnchorsProvider>
       </AuthProvider>
+      </LangProvider>
     </QueryClientProvider>
   );
 }

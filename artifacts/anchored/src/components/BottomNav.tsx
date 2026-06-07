@@ -1,15 +1,17 @@
 import { Link, useLocation } from "wouter";
 import { LayoutDashboard, Link2, Clock, Settings } from "lucide-react";
+import { useT } from "@/lib/lang-context";
 import { cn } from "@/lib/utils";
 
 export function BottomNav() {
   const [location] = useLocation();
+  const t = useT();
 
   const navItems = [
-    { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
-    { href: "/anchors", icon: Link2, label: "Anchors" },
-    { href: "/proof", icon: Clock, label: "Proof" },
-    { href: "/settings", icon: Settings, label: "Settings" }
+    { href: "/dashboard", icon: LayoutDashboard, label: t.nav.home },
+    { href: "/anchors",   icon: Link2,           label: t.nav.anchors },
+    { href: "/proof",     icon: Clock,           label: t.nav.proof },
+    { href: "/settings",  icon: Settings,        label: t.nav.settings },
   ];
 
   return (
@@ -18,7 +20,7 @@ export function BottomNav() {
         {navItems.map(({ href, icon: Icon, label }) => {
           const isActive = location === href;
           return (
-            <Link key={href} href={href} className="flex flex-col items-center justify-center w-16 h-full gap-1" data-testid={`nav-${label.toLowerCase()}`}>
+            <Link key={href} href={href} className="flex flex-col items-center justify-center w-16 h-full gap-1" data-testid={`nav-${href.replace("/", "")}`}>
               <Icon className={cn("w-6 h-6 transition-colors", isActive ? "text-primary" : "text-muted-foreground")} />
               <span className={cn("text-[10px] font-medium transition-colors", isActive ? "text-primary" : "text-muted-foreground")}>
                 {label}

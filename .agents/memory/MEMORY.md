@@ -4,4 +4,5 @@
 - [Expo scaffold useColors](expo-scaffold-usecolors.md) — adding a non-palette top-level key (e.g. radius) to constants/colors.ts breaks the scaffold's generic useColors cast; index colors.light/.dark directly.
 - [Mobile publishing path](mobile-publishing.md) — no EAS/eas.json on Replit; iOS ships via Expo Launch (suggestDeploy from main agent only), Android unsupported; "store" tasks = finalize app.json readiness.
 - [Switch as async trigger](switch-as-async-trigger.md) — a toggle that fires an async action must show pending (checked+disabled) state, not checked={false}, or it bounces back and double-fires.
+- [Custom anchor DB migration](custom-anchor-migration.md) — emoji+color columns must be added via 0002_custom_anchors.sql in Supabase before CreateAnchorSheet saves correctly.
 - [Store screenshot generation](store-screenshot-generation.md) — no Playwright/Chromium, but ImageMagick+librsvg renders SVG marketing frames to exact store sizes; install brand TTFs to ~/.fonts.

@@ -3,7 +3,7 @@ import { supabase } from "./supabase-client";
 export type VerificationMethod = "Self-confirm" | "Photo" | "Receipt";
 export type ProofStatus = "Unverified" | "Self-confirmed" | "Verified";
 
-export type Category = "Home Safety" | "Medication" | "Bills & Receipts" | "Personal Care" | "Pet Care";
+export type Category = "Home Safety" | "Medication" | "Bills & Receipts" | "Personal Care" | "Pet Care" | "Other";
 
 export interface Anchor {
   id: string;
@@ -12,6 +12,8 @@ export interface Anchor {
   verificationMethod: VerificationMethod;
   active: boolean;
   createdAt: string;
+  emoji?: string;
+  color?: string;
 }
 
 export interface Proof {
@@ -34,6 +36,8 @@ interface AnchorRow {
   verification_method: VerificationMethod;
   active: boolean;
   created_at: string;
+  emoji?: string | null;
+  color?: string | null;
 }
 
 interface ProofRow {
@@ -57,6 +61,8 @@ function mapAnchor(row: AnchorRow): Anchor {
     verificationMethod: row.verification_method,
     active: row.active,
     createdAt: row.created_at,
+    emoji: row.emoji ?? undefined,
+    color: row.color ?? undefined,
   };
 }
 
@@ -102,6 +108,8 @@ export async function insertAnchors(anchors: Anchor[]): Promise<void> {
     verification_method: a.verificationMethod,
     active: a.active,
     created_at: a.createdAt,
+    ...(a.emoji ? { emoji: a.emoji } : {}),
+    ...(a.color ? { color: a.color } : {}),
   }));
   const { error } = await supabase.from("anchors").insert(rows);
   if (error) throw error;
@@ -115,6 +123,8 @@ export async function updateAnchor(anchor: Anchor): Promise<void> {
       category: anchor.category,
       verification_method: anchor.verificationMethod,
       active: anchor.active,
+      ...(anchor.emoji ? { emoji: anchor.emoji } : {}),
+      ...(anchor.color ? { color: anchor.color } : {}),
     })
     .eq("id", anchor.id);
   if (error) throw error;
