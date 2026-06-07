@@ -11,6 +11,7 @@ import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
+import { useT } from "@/lib/lang-context";
 import { ProofCard } from "@/components/ProofCard";
 import type { Proof } from "@/lib/storage";
 
@@ -28,6 +29,7 @@ function formatDateKey(dateKey: string): string {
 export default function ProofScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const t = useT();
   const { proofs, anchors, loading } = useAnchors();
 
   const sections = useMemo(() => {
@@ -58,10 +60,10 @@ export default function ProofScreen() {
       >
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.foreground }]}>
-            Your Proof
+            {t.proof.title}
           </Text>
           <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-            Timeline of completed anchors.
+            {t.proof.subtitle}
           </Text>
         </View>
 
@@ -75,10 +77,10 @@ export default function ProofScreen() {
               <Feather name="check" size={34} color={colors.mutedForeground} />
             </View>
             <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
-              No proof yet.
+              {t.proof.noneYet}
             </Text>
             <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-              Start verifying your anchors on the Today tab.
+              {t.proof.noneYetSub}
             </Text>
           </View>
         ) : (

@@ -19,6 +19,7 @@ import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
 import { useAuth } from "@/lib/auth-context";
 import { useReminders } from "@/lib/reminders-context";
+import { useLang, useT, type Lang } from "@/lib/lang-context";
 
 function formatTime(hour: number, minute: number): string {
   const period = hour >= 12 ? "PM" : "AM";
@@ -39,6 +40,8 @@ export default function SettingsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const t = useT();
+  const { lang, setLang } = useLang();
   const { clearAll } = useAnchors();
   const { user, signOut } = useAuth();
   const {
@@ -56,18 +59,12 @@ export default function SettingsScreen() {
 
   const handleToggleReminders = async (next: boolean) => {
     if (!supported) {
-      Alert.alert(
-        "Not available here",
-        "Daily reminders work in the Anchored mobile app.",
-      );
+      Alert.alert(t.settings.notAvailableHere, t.settings.notAvailableHereMsg);
       return;
     }
     const result = await setEnabled(next);
     if (next && !result) {
-      Alert.alert(
-        "Notifications are off",
-        "Enable notifications for Anchored in your device Settings to get daily reminders.",
-      );
+      Alert.alert(t.settings.notificationsOff, t.settings.notificationsOffMsg);
     }
   };
 
@@ -87,18 +84,18 @@ export default function SettingsScreen() {
 
   const handleClearAll = () => {
     Alert.alert(
-      "Are you absolutely sure?",
-      "This permanently deletes all of your anchors and proofs. This cannot be undone.",
+      t.settings.clearDialog.title,
+      t.settings.clearDialog.message,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t.settings.clearDialog.cancel, style: "cancel" },
         {
-          text: "Delete everything",
+          text: t.settings.clearDialog.confirm,
           style: "destructive",
           onPress: async () => {
             try {
               await clearAll();
             } catch {
-              Alert.alert("Could not clear data", "Please try again.");
+              Alert.alert(t.settings.clearDialog.couldNotClear, t.anchors.tryAgain);
             }
           },
         },
@@ -107,21 +104,26 @@ export default function SettingsScreen() {
   };
 
   const handleSignOut = () => {
-    Alert.alert("Sign out", "Are you sure you want to sign out?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t.settings.signOutDialog.title, t.settings.signOutDialog.message, [
+      { text: t.settings.signOutDialog.cancel, style: "cancel" },
       {
-        text: "Sign out",
+        text: t.settings.signOutDialog.confirm,
         style: "destructive",
         onPress: async () => {
           try {
             await signOut();
           } catch {
-            Alert.alert("Could not sign out", "Please try again.");
+            Alert.alert(t.settings.signOutDialog.couldNotSignOut, "Please try again.");
           }
         },
       },
     ]);
   };
+
+  const LANGS: { key: Lang; label: string }[] = [
+    { key: "en", label: "🇺🇸 English" },
+    { key: "es", label: "🇨🇱 Español" },
+  ];
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -129,7 +131,7 @@ export default function SettingsScreen() {
         contentContainerStyle={[styles.content, { paddingTop: topPad }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.title, { color: colors.foreground }]}>Settings</Text>
+        <Text style={[styles.title, { color: colors.foreground }]}>{t.settings.title}</Text>
 
         <View
           style={[
@@ -144,18 +146,55 @@ export default function SettingsScreen() {
           </View>
           <View style={styles.profileText}>
             <Text style={[styles.profileTitle, { color: colors.foreground }]}>
-              My Account
+              {t.settings.myAccount}
             </Text>
             <Text
               numberOfLines={1}
               style={[styles.profileEmail, { color: colors.mutedForeground }]}
             >
-              {user?.email ?? "Signed in"}
+              {user?.email ?? t.settings.signedIn}
             </Text>
           </View>
         </View>
 
-        <SectionLabel>ANCHORS</SectionLabel>
+        <SectionLabel>{t.settings.languageSection}</SectionLabel>
+        <View
+          style={[
+            styles.langCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <View style={[styles.rowIcon, { backgroundColor: "rgba(59,130,246,0.1)" }]}>
+            <Feather name="globe" size={20} color={colors.primary} />
+          </View>
+          <View style={styles.langBtns}>
+            {LANGS.map(({ key, label }) => (
+              <Pressable
+                key={key}
+                onPress={() => setLang(key)}
+                style={({ pressed }) => [
+                  styles.langBtn,
+                  {
+                    backgroundColor: lang === key ? colors.primary : colors.muted,
+                    opacity: pressed ? 0.85 : 1,
+                  },
+                ]}
+                testID={`btn-lang-${key}`}
+              >
+                <Text
+                  style={[
+                    styles.langBtnText,
+                    { color: lang === key ? colors.primaryForeground : colors.mutedForeground },
+                  ]}
+                >
+                  {label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        <SectionLabel>{t.settings.anchorsSection}</SectionLabel>
         <Pressable
           onPress={() => router.push("/onboarding")}
           style={({ pressed }) => [
@@ -168,13 +207,13 @@ export default function SettingsScreen() {
               <Feather name="plus" size={20} color={colors.primary} />
             </View>
             <Text style={[styles.rowText, { color: colors.foreground }]}>
-              Add more anchors
+              {t.settings.addMore}
             </Text>
           </View>
           <Feather name="chevron-right" size={20} color={colors.mutedForeground} />
         </Pressable>
 
-        <SectionLabel>REMINDERS</SectionLabel>
+        <SectionLabel>{t.settings.remindersSection}</SectionLabel>
         <View
           style={[
             styles.reminderCard,
@@ -188,12 +227,12 @@ export default function SettingsScreen() {
               </View>
               <View style={styles.reminderTextWrap}>
                 <Text style={[styles.rowText, { color: colors.foreground }]}>
-                  Daily reminder
+                  {t.settings.dailyReminder}
                 </Text>
                 <Text
                   style={[styles.reminderSub, { color: colors.mutedForeground }]}
                 >
-                  Nudge me to verify my routines
+                  {t.settings.dailyReminderSub}
                 </Text>
               </View>
             </View>
@@ -217,7 +256,7 @@ export default function SettingsScreen() {
               testID="btn-reminder-time"
             >
               <Text style={[styles.rowText, { color: colors.foreground }]}>
-                Reminder time
+                {t.settings.reminderTime}
               </Text>
               <View style={styles.reminderTimeRight}>
                 <Text style={[styles.reminderTimeValue, { color: colors.primary }]}>
@@ -242,12 +281,12 @@ export default function SettingsScreen() {
 
           {!supported && (
             <Text style={[styles.reminderSub, { color: colors.mutedForeground, marginTop: 12 }]}>
-              Reminders are available in the Anchored mobile app.
+              {t.settings.remindersUnavailable}
             </Text>
           )}
         </View>
 
-        <SectionLabel>DATA</SectionLabel>
+        <SectionLabel>{t.settings.dataSection}</SectionLabel>
         <Pressable
           onPress={handleClearAll}
           style={({ pressed }) => [
@@ -260,12 +299,12 @@ export default function SettingsScreen() {
               <Feather name="trash-2" size={20} color={colors.destructive} />
             </View>
             <Text style={[styles.rowText, { color: colors.destructive }]}>
-              Clear all data
+              {t.settings.clearAll}
             </Text>
           </View>
         </Pressable>
 
-        <SectionLabel>ACCOUNT</SectionLabel>
+        <SectionLabel>{t.settings.accountSection}</SectionLabel>
         <Pressable
           onPress={handleSignOut}
           style={({ pressed }) => [
@@ -278,7 +317,7 @@ export default function SettingsScreen() {
               <Feather name="log-out" size={20} color={colors.foreground} />
             </View>
             <Text style={[styles.rowText, { color: colors.foreground }]}>
-              Sign out
+              {t.settings.signOut}
             </Text>
           </View>
           <Feather name="chevron-right" size={20} color={colors.mutedForeground} />
@@ -286,10 +325,10 @@ export default function SettingsScreen() {
 
         <View style={styles.footer}>
           <Text style={[styles.footerText, { color: colors.mutedForeground }]}>
-            Anchored v1.0
+            {t.settings.version}
           </Text>
           <Text style={[styles.footerSub, { color: colors.mutedForeground }]}>
-            Synced securely to your account.
+            {t.settings.synced}
           </Text>
         </View>
       </ScrollView>
@@ -344,6 +383,30 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginBottom: 8,
     marginLeft: 4,
+  },
+  langCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+    marginBottom: 20,
+  },
+  langBtns: {
+    flexDirection: "row",
+    gap: 8,
+    flex: 1,
+  },
+  langBtn: {
+    flex: 1,
+    paddingVertical: 9,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  langBtnText: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
   },
   rowCard: {
     flexDirection: "row",

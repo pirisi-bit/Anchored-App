@@ -8,7 +8,8 @@ export type Category =
   | "Medication"
   | "Bills & Receipts"
   | "Personal Care"
-  | "Pet Care";
+  | "Pet Care"
+  | "Other";
 
 export interface Anchor {
   id: string;
@@ -17,6 +18,8 @@ export interface Anchor {
   verificationMethod: VerificationMethod;
   active: boolean;
   createdAt: string;
+  emoji?: string;
+  color?: string;
 }
 
 export interface Proof {

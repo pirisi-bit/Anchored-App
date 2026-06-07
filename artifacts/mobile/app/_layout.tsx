@@ -20,6 +20,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { AnchorsProvider, useAnchors } from "@/lib/anchors-context";
 import { RemindersProvider } from "@/lib/reminders-context";
+import { LangProvider } from "@/lib/lang-context";
 import {
   getReminderAnchorId,
   isDailyReminderResponse,
@@ -159,6 +160,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <KeyboardProvider>
+              <LangProvider>
               <AuthProvider>
                 <AnchorsProvider>
                   <RemindersProvider>
@@ -166,6 +168,7 @@ export default function RootLayout() {
                   </RemindersProvider>
                 </AnchorsProvider>
               </AuthProvider>
+              </LangProvider>
             </KeyboardProvider>
           </GestureHandlerRootView>
         </QueryClientProvider>

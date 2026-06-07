@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
+import { useT } from "@/lib/lang-context";
 import { categoryColor, CATEGORY_ORDER } from "@/lib/categories";
 import type { Anchor, Category } from "@/lib/storage";
 
@@ -22,6 +23,7 @@ export default function AnchorsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const t = useT();
   const { anchors, loading, updateAnchorState } = useAnchors();
 
   const grouped = useMemo(() => {
@@ -42,7 +44,7 @@ export default function AnchorsScreen() {
     try {
       await updateAnchorState({ ...anchor, active });
     } catch {
-      Alert.alert("Could not update", "Please try again.");
+      Alert.alert(t.anchors.couldNotUpdate, t.anchors.tryAgain);
     }
   };
 
@@ -54,10 +56,10 @@ export default function AnchorsScreen() {
       >
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.foreground }]}>
-            Manage Anchors
+            {t.anchors.title}
           </Text>
           <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-            Enable or disable your tracked habits.
+            {t.anchors.subtitle}
           </Text>
         </View>
 
@@ -68,7 +70,7 @@ export default function AnchorsScreen() {
         ) : anchors.length === 0 ? (
           <View style={styles.empty}>
             <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-              You haven't set up any anchors yet.
+              {t.anchors.noAnchors}
             </Text>
           </View>
         ) : (
@@ -81,7 +83,9 @@ export default function AnchorsScreen() {
                     { backgroundColor: categoryColor(category, colors) },
                   ]}
                 >
-                  <Text style={styles.categoryChipText}>{category}</Text>
+                  <Text style={styles.categoryChipText}>
+                    {t.categories[category] ?? category}
+                  </Text>
                 </View>
                 <View
                   style={[
@@ -100,6 +104,9 @@ export default function AnchorsScreen() {
                         },
                       ]}
                     >
+                      {anchor.emoji ? (
+                        <Text style={styles.emoji}>{anchor.emoji}</Text>
+                      ) : null}
                       <Text
                         style={[
                           styles.anchorName,
@@ -193,12 +200,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
+    gap: 8,
+  },
+  emoji: {
+    fontSize: 20,
   },
   anchorName: {
     fontSize: 15,
     fontFamily: "Inter_500Medium",
     flex: 1,
-    marginRight: 12,
+    marginRight: 4,
   },
   fab: {
     position: "absolute",

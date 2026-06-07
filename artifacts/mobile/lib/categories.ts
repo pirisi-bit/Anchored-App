@@ -32,6 +32,7 @@ export const CATEGORY_ORDER: Category[] = [
   "Bills & Receipts",
   "Personal Care",
   "Pet Care",
+  "Other",
 ];
 
 export const TEMPLATES: Record<Category, string[]> = {
@@ -62,4 +63,5 @@ export const TEMPLATES: Record<Category, string[]> = {
     "Drank 8 glasses of water",
   ],
   "Pet Care": ["Fed pet", "Pet walk", "Pet medication", "Cleaned litter"],
+  Other: [],
 };

@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
+import { useT } from "@/lib/lang-context";
 import { categoryColor, CATEGORY_ORDER, TEMPLATES } from "@/lib/categories";
 import type { Anchor, Category, VerificationMethod } from "@/lib/storage";
 
@@ -27,13 +28,20 @@ export default function OnboardingScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const t = useT();
   const { anchors, addAnchors } = useAnchors();
 
-  const [expanded, setExpanded] = useState<Category | null>(CATEGORY_ORDER[0]);
+  // Only show categories that have templates
+  const availableCategories = CATEGORY_ORDER.filter(
+    (c) => TEMPLATES[c] && TEMPLATES[c].length > 0,
+  );
+
+  const [expanded, setExpanded] = useState<Category | null>(availableCategories[0] ?? null);
   const [selected, setSelected] = useState<Record<string, Category>>({});
   const [saving, setSaving] = useState(false);
 
-  const existingNames = new Set(anchors.map((a) => a.name));
+  // Dedup: names already in the user's anchors (lowercased for comparison)
+  const existingNames = new Set(anchors.map((a) => a.name.toLowerCase()));
 
   const toggle = (template: string, category: Category) => {
     setSelected((prev) => {
@@ -51,18 +59,20 @@ export default function OnboardingScreen() {
   const topPad = insets.top + (Platform.OS === "web" ? 67 : 0) + 12;
 
   const save = async () => {
-    const entries = Object.entries(selected).filter(
-      ([name]) => !existingNames.has(name),
-    );
+    // Map template keys to translated labels
+    const entries = Object.entries(selected).filter(([key]) => {
+      const label = t.templateNames[key] ?? key;
+      return !existingNames.has(label.toLowerCase());
+    });
     if (entries.length === 0) {
       router.back();
       return;
     }
     setSaving(true);
     const now = new Date().toISOString();
-    const newAnchors: Anchor[] = entries.map(([name, category]) => ({
+    const newAnchors: Anchor[] = entries.map(([key, category]) => ({
       id: Crypto.randomUUID(),
-      name,
+      name: t.templateNames[key] ?? key,
       category,
       verificationMethod: defaultMethod(category),
       active: true,
@@ -73,7 +83,7 @@ export default function OnboardingScreen() {
       router.back();
     } catch {
       setSaving(false);
-      Alert.alert("Could not save", "Please try again.");
+      Alert.alert(t.onboarding.couldNotSave, t.onboarding.tryAgain);
     }
   };
 
@@ -90,16 +100,16 @@ export default function OnboardingScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={[styles.title, { color: colors.foreground }]}>
-          Pick your anchors
+          {t.onboarding.title}
         </Text>
         <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-          Choose the routines you want to prove each day. You can change these
-          anytime.
+          {t.onboarding.subtitle}
         </Text>
 
         <View style={styles.groups}>
-          {CATEGORY_ORDER.map((category) => {
+          {availableCategories.map((category) => {
             const isOpen = expanded === category;
+            const categoryLabel = t.categories[category] ?? category;
             return (
               <View
                 key={category}
@@ -115,7 +125,7 @@ export default function OnboardingScreen() {
                     { backgroundColor: categoryColor(category, colors) },
                   ]}
                 >
-                  <Text style={styles.groupHeaderText}>{category}</Text>
+                  <Text style={styles.groupHeaderText}>{categoryLabel}</Text>
                   <Feather
                     name={isOpen ? "chevron-up" : "chevron-down"}
                     size={20}
@@ -125,13 +135,14 @@ export default function OnboardingScreen() {
 
                 {isOpen ? (
                   <View style={styles.templates}>
-                    {TEMPLATES[category].map((template) => {
-                      const checked = !!selected[template];
-                      const already = existingNames.has(template);
+                    {TEMPLATES[category].map((key) => {
+                      const label = t.templateNames[key] ?? key;
+                      const checked = !!selected[key];
+                      const already = existingNames.has(label.toLowerCase());
                       return (
                         <Pressable
-                          key={template}
-                          onPress={() => !already && toggle(template, category)}
+                          key={key}
+                          onPress={() => !already && toggle(key, category)}
                           style={styles.templateRow}
                           disabled={already}
                         >
@@ -160,8 +171,8 @@ export default function OnboardingScreen() {
                               },
                             ]}
                           >
-                            {template}
-                            {already ? "  (added)" : ""}
+                            {label}
+                            {already ? `  ${t.onboarding.alreadyAdded}` : ""}
                           </Text>
                         </Pressable>
                       );
@@ -196,9 +207,7 @@ export default function OnboardingScreen() {
             <ActivityIndicator color={colors.primaryForeground} />
           ) : (
             <Text style={[styles.saveBtnText, { color: colors.primaryForeground }]}>
-              {selectedCount > 0
-                ? `Add ${selectedCount} anchor${selectedCount > 1 ? "s" : ""}`
-                : "Done"}
+              {t.onboarding.addBtn(selectedCount)}
             </Text>
           )}
         </Pressable>

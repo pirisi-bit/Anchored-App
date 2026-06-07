@@ -12,6 +12,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
+import { useT } from "@/lib/lang-context";
 import { AnchorCard } from "@/components/AnchorCard";
 import { ProgressBar } from "@/components/ProgressBar";
 import { CaptureSheet, type CaptureMode } from "@/components/CaptureSheet";
@@ -29,6 +30,7 @@ export default function DashboardScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const t = useT();
   const { focusAnchor, focusKey } = useLocalSearchParams<{
     focusAnchor?: string;
     focusKey?: string;
@@ -116,6 +118,13 @@ export default function DashboardScreen() {
     setCapture(null);
   };
 
+  const progressHint =
+    total === 0
+      ? t.dashboard.addAnchorsHint
+      : percent === 100
+        ? t.dashboard.allDone
+        : t.dashboard.percentDone(percent);
+
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <ScrollView
@@ -130,7 +139,7 @@ export default function DashboardScreen() {
           <Text style={[styles.date, { color: colors.mutedForeground }]}>
             {todayLabel()}
           </Text>
-          <Text style={[styles.title, { color: colors.foreground }]}>Today</Text>
+          <Text style={[styles.title, { color: colors.foreground }]}>{t.dashboard.title}</Text>
         </View>
 
         {loading ? (
@@ -147,7 +156,7 @@ export default function DashboardScreen() {
             >
               <View style={styles.progressTop}>
                 <Text style={[styles.progressLabel, { color: colors.foreground }]}>
-                  Daily progress
+                  {t.dashboard.dailyProgress}
                 </Text>
                 <Text style={[styles.progressCount, { color: colors.primary }]}>
                   {doneCount}/{total}
@@ -155,27 +164,23 @@ export default function DashboardScreen() {
               </View>
               <ProgressBar value={percent} />
               <Text style={[styles.progressHint, { color: colors.mutedForeground }]}>
-                {total === 0
-                  ? "Add anchors to start tracking."
-                  : percent === 100
-                    ? "All anchors verified today. Nice work."
-                    : `${percent}% done — keep it up.`}
+                {progressHint}
               </Text>
             </View>
 
             {total === 0 ? (
               <View style={styles.empty}>
                 <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
-                  No active anchors yet.
+                  {t.dashboard.noAnchorsTitle}
                 </Text>
                 <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-                  Set up the routines you want to prove each day.
+                  {t.dashboard.noAnchorsText}
                 </Text>
                 <Text
                   onPress={() => router.push("/onboarding")}
                   style={[styles.link, { color: colors.primary }]}
                 >
-                  Add anchors →
+                  {t.dashboard.addAnchorsLink}
                 </Text>
               </View>
             ) : (

@@ -4,6 +4,7 @@ import * as Haptics from "expo-haptics";
 import type { Anchor, Proof } from "@/lib/storage";
 import { categoryColor } from "@/lib/categories";
 import { useColors } from "@/hooks/useColors";
+import { useT } from "@/lib/lang-context";
 import { StatusBadge } from "./StatusBadge";
 
 interface AnchorCardProps {
@@ -71,6 +72,7 @@ export function AnchorCard({
   onViewProof,
 }: AnchorCardProps) {
   const colors = useColors();
+  const t = useT();
   const isDone = !!proof;
 
   return (
@@ -97,10 +99,10 @@ export function AnchorCard({
         />
         <View style={styles.titleWrap}>
           <Text style={[styles.name, { color: colors.foreground }]}>
-            {anchor.name}
+            {anchor.emoji ? `${anchor.emoji} ` : ""}{anchor.name}
           </Text>
           <Text style={[styles.category, { color: colors.mutedForeground }]}>
-            {anchor.category}
+            {t.categories[anchor.category] ?? anchor.category}
           </Text>
         </View>
         <StatusBadge status={proof ? proof.status : "Unverified"} />
@@ -108,11 +110,11 @@ export function AnchorCard({
 
       {!isDone ? (
         <View style={styles.actions}>
-          <ActionButton icon="check" label="Confirm" onPress={onSelfConfirm} />
-          <ActionButton icon="camera" label="Photo" onPress={onPhoto} />
+          <ActionButton icon="check" label={t.card.confirm} onPress={onSelfConfirm} />
+          <ActionButton icon="camera" label={t.card.photo} onPress={onPhoto} />
           <ActionButton
             icon="file-text"
-            label="Receipt"
+            label={t.card.receipt}
             onPress={onReceipt}
             filled
           />
@@ -120,7 +122,7 @@ export function AnchorCard({
       ) : (
         <Pressable onPress={onViewProof} hitSlop={8}>
           <Text style={[styles.viewProof, { color: colors.primary }]}>
-            View Proof →
+            {t.card.viewProof}
           </Text>
         </Pressable>
       )}

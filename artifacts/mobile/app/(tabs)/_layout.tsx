@@ -8,25 +8,27 @@ import React from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
 import { useColors } from "@/hooks/useColors";
+import { useT } from "@/lib/lang-context";
 
 function NativeTabLayout() {
+  const t = useT();
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="index">
         <Icon sf={{ default: "house", selected: "house.fill" }} />
-        <Label>Home</Label>
+        <Label>{t.tabs.home}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="anchors">
         <Icon sf={{ default: "circle.grid.2x2", selected: "circle.grid.2x2.fill" }} />
-        <Label>Anchors</Label>
+        <Label>{t.tabs.anchors}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="proof">
         <Icon sf={{ default: "checkmark.seal", selected: "checkmark.seal.fill" }} />
-        <Label>Proof</Label>
+        <Label>{t.tabs.proof}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
         <Icon sf={{ default: "gearshape", selected: "gearshape.fill" }} />
-        <Label>Settings</Label>
+        <Label>{t.tabs.settings}</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
@@ -34,6 +36,7 @@ function NativeTabLayout() {
 
 function ClassicTabLayout() {
   const colors = useColors();
+  const t = useT();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const isIOS = Platform.OS === "ios";
@@ -74,7 +77,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: t.tabs.home,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="house" tintColor={color} size={24} />
@@ -86,7 +89,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="anchors"
         options={{
-          title: "Anchors",
+          title: t.tabs.anchors,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="circle.grid.2x2" tintColor={color} size={24} />
@@ -98,7 +101,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="proof"
         options={{
-          title: "Proof",
+          title: t.tabs.proof,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="checkmark.seal" tintColor={color} size={24} />
@@ -110,7 +113,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
+          title: t.tabs.settings,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="gearshape" tintColor={color} size={24} />
