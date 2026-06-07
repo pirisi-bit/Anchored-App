@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
+import { useT } from "@/lib/lang-context";
 import { categoryColor } from "@/lib/categories";
 import { StatusBadge } from "@/components/StatusBadge";
 
@@ -43,6 +44,7 @@ export default function ProofReviewScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { proofs, anchors, loading } = useAnchors();
+  const t = useT();
 
   const topPad = insets.top + (Platform.OS === "web" ? 67 : 0) + 12;
 
@@ -102,7 +104,7 @@ export default function ProofReviewScreen() {
             style={[styles.dot, { backgroundColor: categoryColor(anchor.category, colors) }]}
           />
           <Text style={[styles.title, { color: colors.foreground }]}>
-            {anchor.name}
+            {t.templateNames[anchor.name] ?? anchor.name}
           </Text>
         </View>
 
@@ -119,7 +121,7 @@ export default function ProofReviewScreen() {
         ) : null}
 
         <View style={[styles.detailCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <DetailRow label="Anchor" value={anchor.name} />
+          <DetailRow label="Anchor" value={t.templateNames[anchor.name] ?? anchor.name} />
           <DetailRow label="Category" value={anchor.category} />
           <DetailRow label="Status" value={<StatusBadge status={proof.status} />} />
           <DetailRow label="Method" value={proof.verificationMethod} />

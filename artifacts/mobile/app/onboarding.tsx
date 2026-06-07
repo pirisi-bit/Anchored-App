@@ -63,8 +63,7 @@ export default function OnboardingScreen() {
   const save = async () => {
     // Map template keys to translated labels
     const entries = Object.entries(selected).filter(([key]) => {
-      const label = t.templateNames[key] ?? key;
-      return !existingNames.has(label.toLowerCase());
+      return !existingNames.has(key.toLowerCase());
     });
     if (entries.length === 0) {
       router.back();
@@ -74,7 +73,7 @@ export default function OnboardingScreen() {
     const now = new Date().toISOString();
     const newAnchors: Anchor[] = entries.map(([key, category]) => ({
       id: Crypto.randomUUID(),
-      name: t.templateNames[key] ?? key,
+      name: key,
       category,
       verificationMethod: defaultMethod(category),
       active: true,

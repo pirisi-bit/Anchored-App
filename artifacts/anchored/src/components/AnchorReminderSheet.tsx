@@ -102,7 +102,7 @@ export function AnchorReminderSheet({ anchor, open, onClose, onSave }: AnchorRem
             </DrawerClose>
           </div>
           {anchor && (
-            <p className="text-sm text-muted-foreground mt-0.5">{anchor.name}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{t.templateNames[anchor.name] ?? anchor.name}</p>
           )}
         </DrawerHeader>
 

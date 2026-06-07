@@ -63,7 +63,7 @@ export default function Onboarding() {
 
     const newAnchors: Anchor[] = selectedTemplates.map((s) => ({
       id: crypto.randomUUID(),
-      name: s.label,
+      name: s.key,
       category: s.category,
       verificationMethod: "Photo",
       active: true,

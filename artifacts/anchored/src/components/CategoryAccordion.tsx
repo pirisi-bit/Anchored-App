@@ -47,7 +47,7 @@ export function CategoryAccordion({
         <AccordionContent className="pt-2 pb-2 px-2">
           <div className="flex flex-col gap-1">
             {templates.map(({ key, label }) => {
-              const isAlreadyAdded = alreadyAddedNames.has(label.toLowerCase());
+              const isAlreadyAdded = alreadyAddedNames.has(key.toLowerCase());
               const isSelected = selectedKeys.includes(key);
               const id = `${category}-${key}`;
               return (

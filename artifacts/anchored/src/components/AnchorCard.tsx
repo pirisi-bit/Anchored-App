@@ -91,7 +91,7 @@ export function AnchorCard({
           {emoji}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-bold text-base leading-snug truncate">{anchor.name}</h3>
+          <h3 className="font-bold text-base leading-snug truncate">{t.templateNames[anchor.name] ?? anchor.name}</h3>
           <p className="text-xs text-muted-foreground">{anchor.category}</p>
         </div>
         <StatusBadge status={proof ? proof.status : "Unverified"} />

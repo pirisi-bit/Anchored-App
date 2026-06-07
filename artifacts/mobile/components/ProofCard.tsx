@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import type { Anchor, Proof } from "@/lib/storage";
 import { categoryColor } from "@/lib/categories";
 import { useColors } from "@/hooks/useColors";
+import { useT } from "@/lib/lang-context";
 import { StatusBadge } from "./StatusBadge";
 
 interface ProofCardProps {
@@ -24,6 +25,7 @@ function formatTime(iso: string): string {
 export function ProofCard({ proof, anchor }: ProofCardProps) {
   const colors = useColors();
   const router = useRouter();
+  const t = useT();
   if (!anchor) return null;
 
   return (
@@ -47,7 +49,7 @@ export function ProofCard({ proof, anchor }: ProofCardProps) {
             ]}
           />
           <Text style={[styles.name, { color: colors.foreground }]}>
-            {anchor.name}
+            {t.templateNames[anchor.name] ?? anchor.name}
           </Text>
         </View>
         <Text style={[styles.time, { color: colors.mutedForeground }]}>

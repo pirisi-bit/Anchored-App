@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Anchor, Proof } from "@/lib/storage";
 import { StatusBadge } from "./StatusBadge";
 import { getCategoryColor } from "./AnchorCard";
+import { useT } from "@/lib/lang-context";
 import { cn } from "@/lib/utils";
 
 interface ProofCardProps {
@@ -12,6 +13,7 @@ interface ProofCardProps {
 
 export function ProofCard({ proof, anchor }: ProofCardProps) {
   const [, setLocation] = useLocation();
+  const t = useT();
   if (!anchor) return null;
 
   return (
@@ -24,7 +26,7 @@ export function ProofCard({ proof, anchor }: ProofCardProps) {
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-2">
           <div className={cn("w-2 h-2 rounded-full", getCategoryColor(anchor.category))} />
-          <h3 className="font-bold text-sm">{anchor.name}</h3>
+          <h3 className="font-bold text-sm">{t.templateNames[anchor.name] ?? anchor.name}</h3>
         </div>
         <span className="text-xs text-muted-foreground">{format(new Date(proof.createdAt), "h:mm a")}</span>
       </div>

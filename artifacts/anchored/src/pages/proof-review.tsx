@@ -1,6 +1,7 @@
 import { useLocation, useRoute } from "wouter";
 import { format } from "date-fns";
 import { useAnchors } from "@/lib/anchors-context";
+import { useT } from "@/lib/lang-context";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getCategoryColor } from "@/components/AnchorCard";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ export default function ProofReview() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/proof/:id");
   const { proofs, anchors, loading } = useAnchors();
+  const t = useT();
 
   const proof = proofs.find(p => p.id === params?.id);
   const anchor = proof ? anchors.find(a => a.id === proof.anchorId) : undefined;
@@ -72,7 +74,7 @@ export default function ProofReview() {
         <p className="text-xs font-medium text-muted-foreground mb-2">PROOF REVIEW</p>
         <div className="flex items-center gap-3">
           <div className={cn("w-3.5 h-3.5 rounded-full shrink-0", getCategoryColor(anchor.category))} />
-          <h1 className="text-2xl font-extrabold tracking-tight leading-tight">{anchor.name}</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight leading-tight">{t.templateNames[anchor.name] ?? anchor.name}</h1>
         </div>
       </header>
 
@@ -90,7 +92,7 @@ export default function ProofReview() {
       )}
 
       <div className="bg-card rounded-2xl p-5 shadow-sm border mb-6">
-        <DetailRow label="Anchor" value={anchor.name} />
+        <DetailRow label="Anchor" value={t.templateNames[anchor.name] ?? anchor.name} />
         <DetailRow label="Category" value={anchor.category} />
         <DetailRow label="Status" value={<StatusBadge status={proof.status} />} />
         <DetailRow label="Verification Method" value={proof.verificationMethod} />

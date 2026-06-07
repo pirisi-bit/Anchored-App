@@ -121,7 +121,7 @@ export function AnchorCard({
         />
         <View style={styles.titleWrap}>
           <Text style={[styles.name, { color: colors.foreground }]}>
-            {anchor.emoji ? `${anchor.emoji} ` : ""}{anchor.name}
+            {anchor.emoji ? `${anchor.emoji} ` : ""}{t.templateNames[anchor.name] ?? anchor.name}
           </Text>
           <Text style={[styles.category, { color: colors.mutedForeground }]}>
             {t.categories[anchor.category] ?? anchor.category}

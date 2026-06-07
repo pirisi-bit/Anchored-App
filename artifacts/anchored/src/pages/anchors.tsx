@@ -40,7 +40,7 @@ export default function AnchorsPage() {
 
   const handleDelete = async (anchor: Anchor) => {
     const confirmed = window.confirm(
-      `Remove "${anchor.name}"? This cannot be undone.`
+      `Remove "${t.templateNames[anchor.name] ?? anchor.name}"? This cannot be undone.`
     );
     if (!confirmed) return;
     try {
@@ -210,7 +210,7 @@ function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, onDelete, t 
           <span className="text-xl shrink-0" aria-hidden>{anchor.emoji}</span>
         )}
         <span className="font-medium truncate">
-          {anchor.name}
+          {t.templateNames[anchor.name] ?? anchor.name}
         </span>
       </div>
 

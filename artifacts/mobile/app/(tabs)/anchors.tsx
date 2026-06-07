@@ -85,7 +85,7 @@ export default function AnchorsScreen() {
   const handleDelete = (anchor: Anchor) => {
     Alert.alert(
       "Remove anchor",
-      `Remove "${anchor.name}"? This cannot be undone.`,
+      `Remove "${t.templateNames[anchor.name] ?? anchor.name}"? This cannot be undone.`,
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -195,7 +195,7 @@ export default function AnchorsScreen() {
                             { color: colors.foreground },
                           ]}
                         >
-                          {anchor.name}
+                          {t.templateNames[anchor.name] ?? anchor.name}
                         </Text>
                         <Switch
                           value={anchor.active}
@@ -252,7 +252,7 @@ export default function AnchorsScreen() {
                             { color: colors.mutedForeground },
                           ]}
                         >
-                          {anchor.name}
+                          {t.templateNames[anchor.name] ?? anchor.name}
                         </Text>
                         <Switch
                           value={anchor.active}
