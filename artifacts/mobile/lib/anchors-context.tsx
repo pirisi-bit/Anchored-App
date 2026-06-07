@@ -14,6 +14,7 @@ import {
   getProofs,
   insertAnchors,
   updateAnchor,
+  setAnchorActive,
   insertProof,
   deleteProofById,
   getTodayKey,
@@ -28,6 +29,7 @@ interface AnchorsContextType {
   loading: boolean;
   addAnchors: (newAnchors: Anchor[]) => Promise<void>;
   updateAnchorState: (anchor: Anchor) => Promise<void>;
+  toggleAnchorActive: (id: string, active: boolean) => Promise<void>;
   selfConfirm: (anchorId: string) => Promise<void>;
   addPhotoProof: (anchorId: string, photoUrl: string) => Promise<void>;
   addReceiptProof: (anchorId: string, receiptUrl: string) => Promise<void>;
@@ -68,6 +70,21 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
+  // Background re-fetch — never sets loading=true so the UI never blanks out.
+  const silentRefresh = useCallback(async () => {
+    if (!user) return;
+    try {
+      const [loadedAnchors, loadedProofs] = await Promise.all([
+        getAnchors(),
+        getProofs(),
+      ]);
+      setAnchors(loadedAnchors);
+      setProofs(loadedProofs);
+    } catch {
+      // silently ignore — optimistic state remains until next successful fetch
+    }
+  }, [user]);
+
   useEffect(() => {
     refresh();
   }, [refresh]);
@@ -79,7 +96,13 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
 
   const updateAnchorState = async (anchor: Anchor) => {
     await updateAnchor(anchor);
-    await refresh();
+    await silentRefresh();
+  };
+
+  // Toggle active/inactive — only writes the `active` column.
+  const toggleAnchorActive = async (id: string, active: boolean) => {
+    await setAnchorActive(id, active);
+    await silentRefresh();
   };
 
   const selfConfirm = async (anchorId: string) => {
@@ -164,6 +187,7 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
         loading,
         addAnchors,
         updateAnchorState,
+        toggleAnchorActive,
         selfConfirm,
         addPhotoProof,
         addReceiptProof,

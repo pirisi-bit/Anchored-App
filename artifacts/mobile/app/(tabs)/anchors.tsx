@@ -25,13 +25,22 @@ export default function AnchorsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const t = useT();
-  const { anchors, loading, updateAnchorState } = useAnchors();
+  const { anchors, loading, toggleAnchorActive } = useAnchors();
   const [createOpen, setCreateOpen] = useState(false);
+  // Optimistic overrides: id → boolean. Applied on top of DB state so the
+  // switch responds instantly even while the network call is in flight.
+  const [activeOverrides, setActiveOverrides] = useState<Record<string, boolean>>({});
+
+  // Merge optimistic overrides into the displayed list.
+  const displayAnchors = useMemo(
+    () => anchors.map((a) => (a.id in activeOverrides ? { ...a, active: activeOverrides[a.id] } : a)),
+    [anchors, activeOverrides],
+  );
 
   // Group by category: predefined CATEGORY_ORDER first, then any custom categories.
   const grouped = useMemo(() => {
     const map = new Map<string, Anchor[]>();
-    for (const anchor of anchors) {
+    for (const anchor of displayAnchors) {
       const list = map.get(anchor.category) ?? [];
       list.push(anchor);
       map.set(anchor.category, list);
@@ -46,15 +55,23 @@ export default function AnchorsScreen() {
       });
       return [c, sorted] as const;
     });
-  }, [anchors]);
+  }, [displayAnchors]);
 
   const topPad = insets.top + (Platform.OS === "web" ? 67 : 0) + 8;
 
   const handleToggle = async (anchor: Anchor, active: boolean) => {
+    setActiveOverrides((prev) => ({ ...prev, [anchor.id]: active }));
     try {
-      await updateAnchorState({ ...anchor, active });
+      await toggleAnchorActive(anchor.id, active);
     } catch {
+      setActiveOverrides((prev) => ({ ...prev, [anchor.id]: anchor.active }));
       Alert.alert(t.anchors.couldNotUpdate, t.anchors.tryAgain);
+    } finally {
+      setActiveOverrides((prev) => {
+        const next = { ...prev };
+        delete next[anchor.id];
+        return next;
+      });
     }
   };
 
@@ -322,7 +339,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   anchorNameInactive: {
-    textDecorationLine: "line-through",
+    opacity: 0.6,
   },
   dividerRow: {
     flexDirection: "row",
