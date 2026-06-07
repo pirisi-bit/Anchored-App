@@ -7,9 +7,10 @@ import {
 } from "@expo-google-fonts/inter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter, useSegments } from "expo-router";
+import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import * as SystemUI from "expo-system-ui";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { ActivityIndicator, View, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -19,6 +20,10 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { AnchorsProvider } from "@/lib/anchors-context";
 import { RemindersProvider } from "@/lib/reminders-context";
+import {
+  isDailyReminderResponse,
+  notificationsSupported,
+} from "@/lib/notifications";
 import { useColors } from "@/hooks/useColors";
 
 SplashScreen.preventAutoHideAsync();
@@ -45,6 +50,7 @@ function RootLayoutNav() {
   const { user, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const handledColdStartResponse = useRef(false);
 
   useEffect(() => {
     if (loading) return;
@@ -55,6 +61,30 @@ function RootLayoutNav() {
       router.replace("/(tabs)");
     }
   }, [user, loading, segments, router]);
+
+  useEffect(() => {
+    if (!notificationsSupported()) return;
+    if (loading || !user) return;
+
+    const goToDashboard = (
+      response: Notifications.NotificationResponse | null,
+    ) => {
+      if (isDailyReminderResponse(response)) {
+        router.replace("/(tabs)");
+      }
+    };
+
+    if (!handledColdStartResponse.current) {
+      handledColdStartResponse.current = true;
+      Notifications.getLastNotificationResponseAsync()
+        .then(goToDashboard)
+        .catch(() => {});
+    }
+
+    const subscription =
+      Notifications.addNotificationResponseReceivedListener(goToDashboard);
+    return () => subscription.remove();
+  }, [user, loading, router]);
 
   if (loading) return <LoadingScreen />;
 
