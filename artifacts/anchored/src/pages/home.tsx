@@ -74,6 +74,20 @@ export default function Home() {
 
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-8 px-6 text-center">
+        <div className="flex items-center justify-center gap-5 text-sm text-muted-foreground">
+          <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-privacy">
+            Privacy
+          </Link>
+          <span className="text-border">·</span>
+          <Link href="/support" className="hover:text-foreground transition-colors" data-testid="link-support">
+            Support
+          </Link>
+        </div>
+        <p className="text-xs text-muted-foreground/60 mt-3">© 2026 Anchored</p>
+      </footer>
     </div>
   );
 }

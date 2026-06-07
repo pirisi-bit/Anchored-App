@@ -133,27 +133,83 @@ form. Confirm against the actual build before submitting.
 
 ---
 
-## Required URLs (fill before submission)
+## Required URLs
 
-- **Privacy Policy URL:** _TODO — must be public_
-- **Support URL:** _TODO_
-- **Marketing URL (optional):** the Anchored web app landing page
+These live on the Anchored web app (`artifacts/anchored`) as public, no-login
+routes. Paste the production-domain versions into App Store Connect / Play
+Console. In development they are reachable at `$REPLIT_DEV_DOMAIN/privacy` and
+`/support`; after the web app is published, use the published HTTPS domain.
+
+- **Privacy Policy URL:** `https://<your-published-domain>/privacy`
+- **Support URL:** `https://<your-published-domain>/support`
+- **Marketing URL (optional):** `https://<your-published-domain>/` (the landing page)
+
+> Pages are wired in `artifacts/anchored/src/App.tsx` (`/privacy`, `/support`)
+> and linked from the landing page footer. Both are public.
+
+> **BEFORE SUBMISSION — support email.** The pages show a contact address from
+> `artifacts/anchored/src/lib/contact.ts` (`support@anchored.app`). Change it to
+> an inbox you actually monitor — both stores require a working support contact,
+> and Apple requires that account/data-deletion requests sent there are honored.
+
+---
+
+## App Review notes (paste into App Store Connect "Notes")
+
+```
+Anchored helps people keep trustworthy daily proof that important routines were
+done (e.g. locking the door, taking medication, paying a bill, pet care).
+
+ACCOUNT FOR REVIEW
+Please create a free account with email + password on first launch (no invite
+code or paid tier is required). Google sign-in is also available.
+
+CAMERA & PHOTO PERMISSIONS
+The app requests camera and photo-library access for a single purpose: when a
+user taps "Photo" or "Receipt" on an anchor, they can capture a photo or attach
+an existing image/PDF as proof that the routine was completed. Access is
+requested only at the moment the user chooses to add proof — never in the
+background. Granting is optional; users can instead "self-confirm" with a tap.
+(See components/CaptureSheet.tsx.)
+
+NOTIFICATIONS
+The single optional daily reminder is a local notification scheduled on-device
+for a user-chosen time; it lists how many routines are still unconfirmed.
+
+PRIVACY / DATA DELETION
+All data is private per user (Supabase row-level security). Users can clear all
+their data in-app via Settings → Data → Clear all data. Full account deletion
+can be requested at the support email on the Support URL.
+```
 
 ---
 
 ## Screenshots — shot list & captions
 
-Real device screenshots must be captured from a build (Apple requires 6.7" and
-6.5" iPhone sizes; Play requires phone screenshots). Suggested frames + caption
-overlays, all on-message with the calm/confidence positioning:
+Ready-to-upload marketing screenshots have been generated into
+`store/screenshots/`, at every size the stores require:
 
-1. **Hero / dashboard** — caption: "Everything's under control."
-2. **Today's anchors, some confirmed** — caption: "See what's done at a glance."
-3. **Verifying with a photo** — caption: "Proof you can trust — not just memory."
-4. **The timeline / history** — caption: "Your dated record, always there."
-5. **Daily reminder setting** — caption: "One gentle nudge, on your schedule."
-6. **Empty / all-done state** — caption: "Nothing left to worry about today."
+- `screenshots/ios-6.7/` — 1290 × 2796 (iPhone 6.7", required by Apple)
+- `screenshots/ios-6.5/` — 1242 × 2688 (iPhone 6.5", required by Apple)
+- `screenshots/android-phone/` — 1080 × 1920 (Google Play phone)
 
-Design notes: warm mid-century palette, generous whitespace, Inter type — keep
-the captions short and reassuring, never urgent.
-```
+Six frames per size, each a device mockup of the real Anchored UI with a calm,
+on-message caption:
+
+1. `01-hero` — "Everything's under control." (today's dashboard)
+2. `02-glance` — "See what's done at a glance." (anchors, mixed states)
+3. `03-proof` — "Proof you can trust — not just memory." (capturing a receipt)
+4. `04-timeline` — "Your dated record, always there." (history)
+5. `05-reminder` — "One gentle nudge, on your schedule." (daily reminder)
+6. `06-alldone` — "Nothing left to worry about today." (all-confirmed state)
+
+These are designed marketing frames (warm mid-century palette, Inter type) that
+faithfully mirror the app. They satisfy the store size requirements as-is. If
+you prefer literal device captures, run the app and screenshot the matching
+screens, then keep the same caption order.
+
+### Regenerating
+
+`node store/generate-screenshots.mjs` (run from `artifacts/mobile/`) rebuilds all
+sizes. It composes SVG and rasterizes with ImageMagick/librsvg; it needs the
+Inter font available to fontconfig and `magick` on PATH.

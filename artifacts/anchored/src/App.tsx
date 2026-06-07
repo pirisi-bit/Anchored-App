@@ -12,6 +12,8 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
 import ResetPassword from "@/pages/reset-password";
+import Privacy from "@/pages/privacy";
+import Support from "@/pages/support";
 import Onboarding from "@/pages/onboarding";
 import Dashboard from "@/pages/dashboard";
 import AnchorsPage from "@/pages/anchors";
@@ -50,7 +52,9 @@ function Router() {
     location === "/" ||
     location === "/onboarding" ||
     location === "/login" ||
-    location === "/reset-password";
+    location === "/reset-password" ||
+    location === "/privacy" ||
+    location === "/support";
 
   return (
     <>
@@ -58,6 +62,8 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/login" component={Login} />
         <Route path="/reset-password" component={ResetPassword} />
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/support" component={Support} />
         <Route path="/onboarding">
           <ProtectedRoute component={Onboarding} />
         </Route>

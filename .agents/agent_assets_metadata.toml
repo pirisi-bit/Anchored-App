@@ -11,3 +11,33 @@ id = "0CKRn0F5aJMu-NwKsBNnR"
 uri = "file://artifacts/mobile/store/store-listing.md"
 type = "text"
 title = "Anchored — App Store & Play Store Listing Content"
+
+[[outputs]]
+id = "99ZjMyj6pS1kAAb9BS9Ub"
+uri = "file://artifacts/mobile/store/screenshots/ios-6.7/01-hero.png"
+type = "image"
+title = "Hero — Everything's under control (6.7\")"
+
+[[outputs]]
+id = "l1NAX6p5zNpzB-TAVMgJ1"
+uri = "file://artifacts/mobile/store/screenshots/ios-6.7/03-proof.png"
+type = "image"
+title = "Proof capture — Proof you can trust (6.7\")"
+
+[[outputs]]
+id = "EkNQLMmfvzCA_hq9q7MR0"
+uri = "file://artifacts/mobile/store/screenshots/ios-6.7/04-timeline.png"
+type = "image"
+title = "Timeline — Your dated record (6.7\")"
+
+[[outputs]]
+id = "gXWjx2uaWSmRVrdRqcCGr"
+uri = "file://artifacts/mobile/store/screenshots/ios-6.7/05-reminder.png"
+type = "image"
+title = "Reminder — One gentle nudge (6.7\")"
+
+[[outputs]]
+id = "Xw4UcPGFKxwjsJ2yZCrmH"
+uri = "file://artifacts/mobile/store/screenshots/ios-6.7/06-alldone.png"
+type = "image"
+title = "All done — Nothing left to worry about (6.7\")"
