@@ -91,12 +91,7 @@ export default function SettingsPage() {
   };
 
   const handleShowTutorial = () => {
-    // Navigate to home then trigger tutorial overlay
     window.dispatchEvent(new Event("show-tutorial"));
-    // Small delay so navigation completes if user is on settings
-    setTimeout(() => {
-      window.location.hash = "";
-    }, 50);
   };
 
   return (

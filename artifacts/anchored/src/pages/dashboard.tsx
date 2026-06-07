@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAnchors } from "@/lib/anchors-context";
 import { useT } from "@/lib/lang-context";
@@ -6,7 +6,6 @@ import { AnchorCard } from "@/components/AnchorCard";
 import { PhotoSheet } from "@/components/PhotoSheet";
 import { ReceiptSheet } from "@/components/ReceiptSheet";
 import { VoiceSheet } from "@/components/VoiceSheet";
-import { TutorialOverlay } from "@/components/TutorialOverlay";
 import { format } from "date-fns";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
@@ -24,17 +23,6 @@ export default function Dashboard() {
   const [activeAnchorForReceipt, setActiveAnchorForReceipt] = useState<Anchor | null>(null);
   const [activeAnchorForVoice, setActiveAnchorForVoice] = useState<Anchor | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
-  const [showTutorial, setShowTutorial] = useState(false);
-
-  // Show tutorial on first login; also listen for manual trigger from settings
-  useEffect(() => {
-    const seen = localStorage.getItem("anchored-tutorial-seen");
-    if (!seen) setShowTutorial(true);
-
-    const handler = () => setShowTutorial(true);
-    window.addEventListener("show-tutorial", handler);
-    return () => window.removeEventListener("show-tutorial", handler);
-  }, []);
 
   const activeAnchors = anchors.filter(a => a.active);
   const completedCount = activeAnchors.filter(a => getTodayProof(a.id)).length;
@@ -243,13 +231,6 @@ export default function Dashboard() {
         onSave={handleVoiceSave}
       />
 
-      <TutorialOverlay
-        open={showTutorial}
-        onClose={() => {
-          localStorage.setItem("anchored-tutorial-seen", "1");
-          setShowTutorial(false);
-        }}
-      />
     </div>
   );
 }

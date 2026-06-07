@@ -1,4 +1,4 @@
-import { useEffect, ComponentType } from "react";
+import { useState, useEffect, ComponentType } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { AnchorsProvider, useAnchors } from "@/lib/anchors-context";
 import { LangProvider } from "@/lib/lang-context";
 import { BottomNav } from "@/components/BottomNav";
+import { TutorialOverlay } from "@/components/TutorialOverlay";
 
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -69,6 +70,17 @@ function Index() {
 
 function Router() {
   const [location] = useLocation();
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    const seen = localStorage.getItem("anchored-tutorial-seen");
+    if (!seen) setShowTutorial(true);
+
+    const handler = () => setShowTutorial(true);
+    window.addEventListener("show-tutorial", handler);
+    return () => window.removeEventListener("show-tutorial", handler);
+  }, []);
+
   const hideNav =
     location === "/" ||
     location === "/onboarding" ||
@@ -106,6 +118,23 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
       {!hideNav && <BottomNav />}
+      {!hideNav && (
+        <button
+          onClick={() => setShowTutorial(true)}
+          aria-label="Open tutorial"
+          title="Tutorial"
+          className="fixed right-0 top-[62%] z-40 -translate-y-1/2 translate-x-5 hover:translate-x-0 transition-transform duration-300 ease-out w-11 h-11 rounded-full bg-violet-500 hover:bg-violet-600 shadow-lg text-white flex items-center justify-center text-xl font-bold select-none"
+        >
+          ?
+        </button>
+      )}
+      <TutorialOverlay
+        open={showTutorial}
+        onClose={() => {
+          localStorage.setItem("anchored-tutorial-seen", "1");
+          setShowTutorial(false);
+        }}
+      />
     </>
   );
 }
