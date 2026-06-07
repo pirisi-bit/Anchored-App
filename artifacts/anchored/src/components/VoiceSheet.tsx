@@ -177,9 +177,13 @@ export function VoiceSheet({ open, onOpenChange, onSave, anchorName }: VoiceShee
             <div className="flex items-center justify-between">
               <DrawerTitle className="text-xl font-bold">{t.voice.title}: {anchorName}</DrawerTitle>
               <DrawerClose asChild>
-                <Button variant="ghost" size="icon" className="rounded-full" disabled={uploading}>
-                  <X className="w-5 h-5" />
-                </Button>
+                <button
+                  disabled={uploading}
+                  className="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-muted/70 transition-colors disabled:opacity-40"
+                  aria-label="Close"
+                >
+                  <X className="w-4 h-4 text-muted-foreground" />
+                </button>
               </DrawerClose>
             </div>
             <p className="text-sm text-muted-foreground pt-1">{t.voice.subtitle}</p>

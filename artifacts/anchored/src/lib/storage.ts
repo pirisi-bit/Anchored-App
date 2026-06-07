@@ -151,6 +151,28 @@ export async function updateAnchor(anchor: Anchor): Promise<void> {
   if (error) throw error;
 }
 
+// Targeted single-column updates so unrelated columns (especially ones that
+// may not yet exist in older schema versions) never appear in the payload.
+
+export async function setAnchorActive(id: string, active: boolean): Promise<void> {
+  const { error } = await supabase
+    .from("anchors")
+    .update({ active })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function setAnchorReminder(
+  id: string,
+  reminder: AnchorReminder | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from("anchors")
+    .update({ reminder })
+    .eq("id", id);
+  if (error) throw error;
+}
+
 export async function getProofs(): Promise<Proof[]> {
   const { data, error } = await supabase
     .from("proofs")

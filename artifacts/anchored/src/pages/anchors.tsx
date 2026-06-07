@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 export default function AnchorsPage() {
   const [, setLocation] = useLocation();
-  const { anchors, loading, updateAnchorState } = useAnchors();
+  const { anchors, loading, toggleAnchorActive, saveAnchorReminder } = useAnchors();
   const t = useT();
   const [createOpen, setCreateOpen] = useState(false);
   const [reminderAnchor, setReminderAnchor] = useState<Anchor | null>(null);
@@ -23,16 +23,13 @@ export default function AnchorsPage() {
   const [activeOverrides, setActiveOverrides] = useState<Record<string, boolean>>({});
 
   const handleToggle = async (anchor: Anchor, checked: boolean) => {
-    // Apply optimistic update immediately
     setActiveOverrides((prev) => ({ ...prev, [anchor.id]: checked }));
     try {
-      await updateAnchorState({ ...anchor, active: checked });
+      await toggleAnchorActive(anchor.id, checked);
     } catch {
-      // Roll back on failure
       setActiveOverrides((prev) => ({ ...prev, [anchor.id]: anchor.active }));
       toast.error(t.errors.couldNotUpdate);
     } finally {
-      // Remove override once the context has refreshed with the real value
       setActiveOverrides((prev) => {
         const next = { ...prev };
         delete next[anchor.id];
@@ -43,7 +40,7 @@ export default function AnchorsPage() {
 
   const handleSaveReminder = async (anchor: Anchor, reminder: AnchorReminder | undefined) => {
     try {
-      await updateAnchorState({ ...anchor, reminder });
+      await saveAnchorReminder(anchor.id, reminder ?? null);
       toast.success(reminder ? t.success.reminderSaved : t.success.reminderRemoved);
     } catch {
       toast.error(t.errors.couldNotUpdate);

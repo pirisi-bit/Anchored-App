@@ -1,11 +1,14 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import {
   Anchor,
+  AnchorReminder,
   Proof,
   getAnchors,
   getProofs,
   insertAnchors,
   updateAnchor,
+  setAnchorActive,
+  setAnchorReminder,
   insertProof,
   deleteProofById,
   getTodayKey,
@@ -20,6 +23,8 @@ interface AnchorsContextType {
   loading: boolean;
   addAnchors: (newAnchors: Anchor[]) => Promise<void>;
   updateAnchorState: (anchor: Anchor) => Promise<void>;
+  toggleAnchorActive: (id: string, active: boolean) => Promise<void>;
+  saveAnchorReminder: (id: string, reminder: AnchorReminder | null) => Promise<void>;
   selfConfirm: (anchorId: string) => Promise<void>;
   addPhotoProof: (anchorId: string, photoUrl: string) => Promise<void>;
   addReceiptProof: (anchorId: string, receiptUrl: string) => Promise<void>;
@@ -73,6 +78,23 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
+  // Background re-fetch that never sets loading=true — used after mutations so
+  // the UI never blanks out to a spinner while the updated data syncs back.
+  const silentRefresh = useCallback(async () => {
+    const token = ++refreshToken.current;
+    if (!user) return;
+    const userId = user.id;
+    try {
+      const [loadedAnchors, loadedProofs] = await Promise.all([getAnchors(), getProofs()]);
+      if (token !== refreshToken.current) return;
+      setAnchors(loadedAnchors);
+      setProofs(loadedProofs);
+      setLoadedUserId(userId);
+    } catch {
+      // silently ignore — optimistic state remains until next successful fetch
+    }
+  }, [user]);
+
   useEffect(() => {
     refresh();
   }, [refresh]);
@@ -84,7 +106,20 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
 
   const updateAnchorState = async (anchor: Anchor) => {
     await updateAnchor(anchor);
-    await refresh();
+    await silentRefresh();
+  };
+
+  // Toggle active/inactive — only writes the `active` column so an absent
+  // `reminder` column (pre-migration) never causes the update to fail.
+  const toggleAnchorActive = async (id: string, active: boolean) => {
+    await setAnchorActive(id, active);
+    await silentRefresh();
+  };
+
+  // Save or clear a reminder — only writes the `reminder` column.
+  const saveAnchorReminder = async (id: string, reminder: AnchorReminder | null) => {
+    await setAnchorReminder(id, reminder);
+    await silentRefresh();
   };
 
   const selfConfirm = async (anchorId: string) => {
@@ -178,6 +213,8 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
         loading: effectiveLoading,
         addAnchors,
         updateAnchorState,
+        toggleAnchorActive,
+        saveAnchorReminder,
         selfConfirm,
         addPhotoProof,
         addReceiptProof,

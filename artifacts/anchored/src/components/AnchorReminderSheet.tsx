@@ -4,7 +4,9 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerClose,
 } from "./ui/drawer";
+import { X } from "lucide-react";
 import { useT } from "@/lib/lang-context";
 import type { Anchor, AnchorReminder } from "@/lib/storage";
 
@@ -88,10 +90,17 @@ export function AnchorReminderSheet({ anchor, open, onClose, onSave }: AnchorRem
     >
       <DrawerContent className="px-4 pb-8">
         <DrawerHeader className="pb-2">
-          <DrawerTitle className="flex items-center gap-2">
-            <span className="text-xl">{anchor?.emoji ?? "⚓"}</span>
-            <span>{t.reminder.title}</span>
-          </DrawerTitle>
+          <div className="flex items-center justify-between">
+            <DrawerTitle className="flex items-center gap-2">
+              <span className="text-xl">{anchor?.emoji ?? "⚓"}</span>
+              <span>{t.reminder.title}</span>
+            </DrawerTitle>
+            <DrawerClose asChild>
+              <button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-muted/70 transition-colors" aria-label="Close">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </DrawerClose>
+          </div>
           {anchor && (
             <p className="text-sm text-muted-foreground mt-0.5">{anchor.name}</p>
           )}
