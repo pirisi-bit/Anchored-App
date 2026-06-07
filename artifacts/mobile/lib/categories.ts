@@ -1,4 +1,4 @@
-import type { Category } from "./storage";
+import { PREDEFINED_CATEGORIES } from "./storage";
 
 type BrandColors = {
   brandSage: string;
@@ -9,7 +9,7 @@ type BrandColors = {
   muted: string;
 };
 
-export function categoryColor(category: Category, colors: BrandColors): string {
+export function categoryColor(category: string, colors: BrandColors): string {
   switch (category) {
     case "Home Safety":
       return colors.brandSage;
@@ -26,16 +26,10 @@ export function categoryColor(category: Category, colors: BrandColors): string {
   }
 }
 
-export const CATEGORY_ORDER: Category[] = [
-  "Home Safety",
-  "Medication",
-  "Bills & Receipts",
-  "Personal Care",
-  "Pet Care",
-  "Other",
-];
+// Predefined display order — custom categories are appended after these.
+export const CATEGORY_ORDER: string[] = [...PREDEFINED_CATEGORIES];
 
-export const TEMPLATES: Record<Category, string[]> = {
+export const TEMPLATES: Record<string, string[]> = {
   "Home Safety": [
     "Locked front door",
     "Turned off stove",

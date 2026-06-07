@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -17,7 +17,8 @@ import { useColors } from "@/hooks/useColors";
 import { useAnchors } from "@/lib/anchors-context";
 import { useT } from "@/lib/lang-context";
 import { categoryColor, CATEGORY_ORDER } from "@/lib/categories";
-import type { Anchor, Category } from "@/lib/storage";
+import type { Anchor } from "@/lib/storage";
+import { CreateAnchorSheet } from "@/components/CreateAnchorSheet";
 
 export default function AnchorsScreen() {
   const colors = useColors();
@@ -25,20 +26,23 @@ export default function AnchorsScreen() {
   const router = useRouter();
   const t = useT();
   const { anchors, loading, updateAnchorState } = useAnchors();
+  const [createOpen, setCreateOpen] = useState(false);
 
-  // Group by category (CATEGORY_ORDER) and sort active before inactive within each group
+  // Group by category: predefined CATEGORY_ORDER first, then any custom categories.
   const grouped = useMemo(() => {
-    const map = new Map<Category, Anchor[]>();
+    const map = new Map<string, Anchor[]>();
     for (const anchor of anchors) {
       const list = map.get(anchor.category) ?? [];
       list.push(anchor);
       map.set(anchor.category, list);
     }
-    return CATEGORY_ORDER.filter((c) => map.has(c)).map((c) => {
+    const knownCats = CATEGORY_ORDER.filter((c) => map.has(c));
+    const customCats = [...map.keys()].filter((c) => !CATEGORY_ORDER.includes(c));
+    return [...knownCats, ...customCats].map((c) => {
       const list = map.get(c)!;
       const sorted = [...list].sort((a, b) => {
         if (a.active === b.active) return 0;
-        return a.active ? -1 : 1; // active first
+        return a.active ? -1 : 1;
       });
       return [c, sorted] as const;
     });
@@ -68,6 +72,27 @@ export default function AnchorsScreen() {
             {t.anchors.subtitle}
           </Text>
         </View>
+
+        {/* Create custom anchor shortcut */}
+        <Pressable
+          onPress={() => setCreateOpen(true)}
+          style={({ pressed }) => [
+            styles.createRow,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              opacity: pressed ? 0.8 : 1,
+            },
+          ]}
+        >
+          <View style={[styles.createIcon, { backgroundColor: colors.primary + "1A" }]}>
+            <Feather name="edit-2" size={18} color={colors.primary} />
+          </View>
+          <Text style={[styles.createLabel, { color: colors.foreground }]}>
+            {t.anchors.createCustom}
+          </Text>
+          <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+        </Pressable>
 
         {loading ? (
           <View style={styles.loading}>
@@ -206,6 +231,8 @@ export default function AnchorsScreen() {
       >
         <Feather name="plus" size={26} color={colors.primaryForeground} />
       </Pressable>
+
+      <CreateAnchorSheet visible={createOpen} onClose={() => setCreateOpen(false)} />
     </View>
   );
 }
@@ -219,7 +246,28 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "center",
   },
-  header: { marginBottom: 24 },
+  header: { marginBottom: 16 },
+  createRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+    marginBottom: 24,
+  },
+  createIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  createLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: "Inter_600SemiBold",
+  },
   title: {
     fontSize: 30,
     fontFamily: "Inter_700Bold",

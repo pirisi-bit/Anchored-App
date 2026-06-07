@@ -71,6 +71,9 @@ export const en = {
     colorLabel: "Color",
     save: "Save anchor",
     nameRequired: "Please enter a name.",
+    newCategory: "New category",
+    newCategoryPlaceholder: "e.g. Work",
+    addCategory: "Add",
   },
   reminder: {
     title: "Reminder",

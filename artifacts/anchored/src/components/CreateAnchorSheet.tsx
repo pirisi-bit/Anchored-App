@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,17 +6,9 @@ import { X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAnchors } from "@/lib/anchors-context";
 import { useT } from "@/lib/lang-context";
-import { Category } from "@/lib/storage";
+import { PREDEFINED_CATEGORIES } from "@/lib/storage";
+import { supabase } from "@/lib/supabase-client";
 import { cn } from "@/lib/utils";
-
-const CATEGORIES: Category[] = [
-  "Home Safety",
-  "Medication",
-  "Bills & Receipts",
-  "Personal Care",
-  "Pet Care",
-  "Other",
-];
 
 const EMOJIS = [
   "🏠","🔒","🍳","🪟","🚨","🔌",
@@ -48,10 +40,26 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
   const { addAnchors } = useAnchors();
 
   const [name, setName] = useState("");
-  const [category, setCategory] = useState<Category>("Other");
+  const [category, setCategory] = useState("Other");
   const [emoji, setEmoji] = useState("📌");
   const [color, setColor] = useState("sage");
   const [saving, setSaving] = useState(false);
+
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  const [showNewCat, setShowNewCat] = useState(false);
+  const [newCatInput, setNewCatInput] = useState("");
+  const [addingCat, setAddingCat] = useState(false);
+
+  // Load the user's saved custom categories whenever the sheet opens.
+  useEffect(() => {
+    if (!open) return;
+    supabase.auth.getUser().then(({ data }) => {
+      const cats = (data.user?.user_metadata?.custom_categories as string[]) ?? [];
+      setCustomCategories(cats);
+    });
+  }, [open]);
+
+  const allCategories = [...PREDEFINED_CATEGORIES, ...customCategories];
 
   const reset = () => {
     setName("");
@@ -59,11 +67,37 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
     setEmoji("📌");
     setColor("sage");
     setSaving(false);
+    setShowNewCat(false);
+    setNewCatInput("");
+    setAddingCat(false);
   };
 
   const handleClose = (next: boolean) => {
     if (!next) reset();
     onOpenChange(next);
+  };
+
+  const handleAddCategory = async () => {
+    const trimmed = newCatInput.trim();
+    if (!trimmed) return;
+    const lower = trimmed.toLowerCase();
+    const existing = allCategories.find((c) => c.toLowerCase() === lower);
+    if (existing) {
+      setCategory(existing);
+      setShowNewCat(false);
+      setNewCatInput("");
+      return;
+    }
+    setAddingCat(true);
+    const updated = [...customCategories, trimmed];
+    const { error } = await supabase.auth.updateUser({ data: { custom_categories: updated } });
+    setAddingCat(false);
+    if (!error) {
+      setCustomCategories(updated);
+      setCategory(trimmed);
+      setShowNewCat(false);
+      setNewCatInput("");
+    }
   };
 
   const handleSave = async () => {
@@ -86,7 +120,7 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
       }]);
       toast.success(t.success.anchorSaved);
       handleClose(false);
-    } catch (e) {
+    } catch {
       toast.error(t.errors.couldNotSave);
       setSaving(false);
     }
@@ -124,7 +158,7 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold">{t.createAnchor.categoryLabel}</label>
             <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((cat) => (
+              {allCategories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
@@ -140,6 +174,47 @@ export function CreateAnchorSheet({ open, onOpenChange }: CreateAnchorSheetProps
                   {t.categories[cat] ?? cat}
                 </button>
               ))}
+
+              {/* "+ New category" toggle */}
+              {!showNewCat ? (
+                <button
+                  type="button"
+                  onClick={() => setShowNewCat(true)}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold border border-dashed border-border bg-transparent hover:bg-muted transition-colors text-muted-foreground"
+                >
+                  + {t.createAnchor.newCategory}
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 w-full mt-1">
+                  <Input
+                    value={newCatInput}
+                    onChange={(e) => setNewCatInput(e.target.value)}
+                    placeholder={t.createAnchor.newCategoryPlaceholder}
+                    className="h-9 rounded-xl text-xs flex-1"
+                    maxLength={30}
+                    onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
+                    autoFocus
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleAddCategory}
+                    disabled={addingCat || !newCatInput.trim()}
+                    className="rounded-xl h-9 px-3 text-xs shrink-0"
+                  >
+                    {addingCat
+                      ? <Loader2 className="w-3 h-3 animate-spin" />
+                      : t.createAnchor.addCategory}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => { setShowNewCat(false); setNewCatInput(""); }}
+                    className="rounded-xl h-9 px-2 shrink-0"
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 

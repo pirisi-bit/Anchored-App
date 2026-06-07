@@ -3,7 +3,18 @@ import { supabase } from "./supabase-client";
 export type VerificationMethod = "Self-confirm" | "Photo" | "Receipt" | "Voice";
 export type ProofStatus = "Unverified" | "Self-confirmed" | "Verified";
 
-export type Category = "Home Safety" | "Medication" | "Bills & Receipts" | "Personal Care" | "Pet Care" | "Other";
+// Open string so users can create their own categories. The predefined set is
+// available as PREDEFINED_CATEGORIES for UI pickers.
+export type Category = string;
+
+export const PREDEFINED_CATEGORIES = [
+  "Home Safety",
+  "Medication",
+  "Bills & Receipts",
+  "Personal Care",
+  "Pet Care",
+  "Other",
+] as const;
 
 export interface AnchorReminder {
   enabled: boolean;

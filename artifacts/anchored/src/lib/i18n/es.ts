@@ -73,6 +73,9 @@ export const es: Translations = {
     colorLabel: "Color",
     save: "Guardar anclaje",
     nameRequired: "Por favor ingresa un nombre.",
+    newCategory: "Nueva categoría",
+    newCategoryPlaceholder: "ej. Trabajo",
+    addCategory: "Agregar",
   },
   reminder: {
     title: "Recordatorio",
