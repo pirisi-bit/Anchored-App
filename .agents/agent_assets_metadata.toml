@@ -41,3 +41,9 @@ id = "Xw4UcPGFKxwjsJ2yZCrmH"
 uri = "file://artifacts/mobile/store/screenshots/ios-6.7/06-alldone.png"
 type = "image"
 title = "All done — Nothing left to worry about (6.7\")"
+
+[[outputs]]
+id = "ZdkPVVeA2sV9F84rzjBg-"
+uri = "file://DEVELOPER_GUIDE.md"
+type = "text"
+title = "Anchored — Developer Handover Guide"
