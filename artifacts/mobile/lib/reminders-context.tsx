@@ -80,7 +80,9 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const remaining = anchors.filter(
-    (a) => !proofs.some((p) => p.anchorId === a.id && p.dateKey === todayKey),
+    (a) =>
+      a.active &&
+      !proofs.some((p) => p.anchorId === a.id && p.dateKey === todayKey),
   ).length;
 
   const remainingRef = useRef(remaining);
