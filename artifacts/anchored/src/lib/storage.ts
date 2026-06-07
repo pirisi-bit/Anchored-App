@@ -149,6 +149,17 @@ export async function upsertProof(proof: Proof): Promise<void> {
   if (error) throw error;
 }
 
+export async function deleteProof(anchorId: string, dateKey: string): Promise<void> {
+  const userId = await currentUserId();
+  const { error } = await supabase
+    .from("proofs")
+    .delete()
+    .eq("user_id", userId)
+    .eq("anchor_id", anchorId)
+    .eq("date_key", dateKey);
+  if (error) throw error;
+}
+
 export async function clearData(): Promise<void> {
   const userId = await currentUserId();
   const proofsResult = await supabase.from("proofs").delete().eq("user_id", userId);

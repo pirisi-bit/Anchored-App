@@ -7,6 +7,7 @@ import {
   insertAnchors,
   updateAnchor,
   upsertProof,
+  deleteProof,
   getTodayKey,
   clearData,
 } from "./storage";
@@ -22,6 +23,7 @@ interface AnchorsContextType {
   selfConfirm: (anchorId: string) => Promise<void>;
   addPhotoProof: (anchorId: string, photoUrl: string) => Promise<void>;
   addReceiptProof: (anchorId: string, receiptUrl: string) => Promise<void>;
+  resetProof: (anchorId: string) => Promise<void>;
   getTodayProof: (anchorId: string) => Proof | undefined;
   refresh: () => Promise<void>;
   clearAll: () => Promise<void>;
@@ -105,6 +107,11 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
     await refresh();
   };
 
+  const resetProof = async (anchorId: string) => {
+    await deleteProof(anchorId, todayKey);
+    await refresh();
+  };
+
   const getTodayProof = (anchorId: string) => {
     return proofs.find((p) => p.anchorId === anchorId && p.dateKey === todayKey);
   };
@@ -126,6 +133,7 @@ export function AnchorsProvider({ children }: { children: ReactNode }) {
         selfConfirm,
         addPhotoProof,
         addReceiptProof,
+        resetProof,
         getTodayProof,
         refresh,
         clearAll,
