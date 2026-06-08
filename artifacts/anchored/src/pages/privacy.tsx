@@ -1,5 +1,6 @@
 import { Link } from "wouter";
-import { Fingerprint, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { BrandMark } from "@/components/BrandMark";
 import { SUPPORT_EMAIL } from "@/lib/contact";
 
 const LAST_UPDATED = "June 7, 2026";
@@ -22,7 +23,7 @@ export default function Privacy() {
           className="flex items-center gap-2 text-foreground"
           data-testid="link-home"
         >
-          <Fingerprint className="w-6 h-6 text-primary" strokeWidth={2.5} />
+          <BrandMark className="h-8 w-8" />
           <span className="font-bold text-lg tracking-tight">DoneMark</span>
         </Link>
         <Link

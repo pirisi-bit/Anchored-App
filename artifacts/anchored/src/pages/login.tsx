@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Fingerprint } from "lucide-react";
+import { BrandMark } from "@/components/BrandMark";
 import { FcGoogle } from "react-icons/fc";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -79,9 +79,7 @@ export default function Login() {
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center max-w-md mx-auto px-6 py-12">
       <div className="flex flex-col items-center mb-8">
-        <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center mb-4">
-          <Fingerprint className="w-8 h-8 text-primary" strokeWidth={2.5} />
-        </div>
+        <BrandMark className="h-16 w-16 mb-4" />
         <h1 className="text-3xl font-extrabold tracking-tight">
           {mode === "signup" ? "Create your account" : "Welcome back"}
         </h1>
