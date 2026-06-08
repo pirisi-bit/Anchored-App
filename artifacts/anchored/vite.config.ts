@@ -13,6 +13,16 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 const basePath = process.env.BASE_PATH ?? "/";
+const localApiOrigin = process.env.LOCAL_API_ORIGIN ?? "http://localhost:5001";
+const localApiProxy =
+  process.env.NODE_ENV !== "production" && process.env.REPL_ID === undefined
+    ? {
+        "/api": {
+          target: localApiOrigin,
+          changeOrigin: true,
+        },
+      }
+    : undefined;
 
 export default defineConfig({
   base: basePath,
@@ -51,6 +61,7 @@ export default defineConfig({
     strictPort: true,
     host: "0.0.0.0",
     allowedHosts: true,
+    proxy: localApiProxy,
     fs: {
       strict: true,
     },
