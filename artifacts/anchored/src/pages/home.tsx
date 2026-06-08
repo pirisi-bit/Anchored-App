@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Anchor, Shield, FileText, Lock } from "lucide-react";
+import { Fingerprint, Shield, FileText, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -8,8 +8,8 @@ export default function Home() {
       {/* 1. Nav/Header */}
       <header className="w-full px-6 py-4 flex items-center justify-between z-10 relative max-w-7xl mx-auto">
         <div className="flex items-center gap-2 text-foreground" data-testid="link-home">
-          <Anchor className="w-6 h-6 text-primary" strokeWidth={2.5} />
-          <span className="font-bold text-lg tracking-tight">Anchored</span>
+          <Fingerprint className="w-6 h-6 text-primary" strokeWidth={2.5} />
+          <span className="font-bold text-lg tracking-tight">DoneMark</span>
         </div>
       </header>
 
@@ -46,7 +46,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground mb-1">Rock Solid</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">Timestamps you can trust. Once it's anchored, it's proof.</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">Timestamps you can trust. Once it's marked, it's proof.</p>
             </div>
           </div>
 
@@ -86,7 +86,7 @@ export default function Home() {
             Support
           </Link>
         </div>
-        <p className="text-xs text-muted-foreground/60 mt-3">© 2026 Anchored</p>
+        <p className="text-xs text-muted-foreground/60 mt-3">© 2026 DoneMark</p>
       </footer>
     </div>
   );

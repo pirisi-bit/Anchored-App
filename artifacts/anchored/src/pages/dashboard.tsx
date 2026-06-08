@@ -171,7 +171,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Anchor list */}
+      {/* Mark list */}
       <div className="flex flex-col gap-3">
         {loading ? (
           <div className="flex justify-center py-12 text-muted-foreground">
@@ -186,7 +186,7 @@ export default function Dashboard() {
           </div>
         ) : visibleAnchors.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground text-sm">
-            {filter === "verified" ? "Nothing verified yet today." : "All anchors verified! 🎉"}
+            {filter === "verified" ? "Nothing verified yet today." : "All marks verified! 🎉"}
           </div>
         ) : (
           visibleAnchors.map(anchor => {

@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Anchor, ArrowLeft } from "lucide-react";
+import { Fingerprint, ArrowLeft } from "lucide-react";
 import { SUPPORT_EMAIL } from "@/lib/contact";
 
 const LAST_UPDATED = "June 7, 2026";
@@ -22,8 +22,8 @@ export default function Privacy() {
           className="flex items-center gap-2 text-foreground"
           data-testid="link-home"
         >
-          <Anchor className="w-6 h-6 text-primary" strokeWidth={2.5} />
-          <span className="font-bold text-lg tracking-tight">Anchored</span>
+          <Fingerprint className="w-6 h-6 text-primary" strokeWidth={2.5} />
+          <span className="font-bold text-lg tracking-tight">DoneMark</span>
         </Link>
         <Link
           href="/"
@@ -41,7 +41,7 @@ export default function Privacy() {
         <div className="space-y-10">
           <Section title="The short version">
             <p>
-              Anchored is built to give you peace of mind, not to harvest your data. Your
+              DoneMark is built to help you keep trusted records, not to harvest your data. Your
               proof is private to you. We don't sell your data, we don't show ads, and we
               don't track you across other apps or websites.
             </p>
@@ -55,8 +55,8 @@ export default function Privacy() {
                 Google, we receive your email address and basic profile from Google.
               </li>
               <li>
-                <strong className="text-foreground">Your content.</strong> The anchors
-                (routines) you choose to track, your daily confirmations, and any photos or
+                <strong className="text-foreground">Your content.</strong> The marks
+                (actions or routines) you choose to track, your daily confirmations, and any photos or
                 receipts you attach as proof.
               </li>
               <li>
@@ -72,7 +72,7 @@ export default function Privacy() {
 
           <Section title="How we use your information">
             <p>
-              We use your information only to provide Anchored: to authenticate you, to store
+              We use your information only to provide DoneMark: to authenticate you, to store
               and display the proof you create, to send the daily reminder you opt into, and
               to keep the service secure. That's it.
             </p>
@@ -80,8 +80,8 @@ export default function Privacy() {
 
           <Section title="Camera & photos">
             <p>
-              Anchored asks for camera and photo-library access only so you can capture a
-              photo or attach a receipt as proof that you completed an anchor. We access these
+              DoneMark asks for camera and photo-library access only so you can capture a
+              photo or attach a receipt as proof that you completed a mark. We access these
               only when you tap to add proof. We never access your camera or photo library in
               the background.
             </p>
@@ -90,7 +90,7 @@ export default function Privacy() {
           <Section title="How your data is stored & shared">
             <p>
               Your account and data are hosted on Supabase, our authentication and database
-              provider, which processes data solely to operate Anchored on our behalf. Files
+              provider, which processes data solely to operate DoneMark on our behalf. Files
               you attach are stored on our own server and referenced from your proof records.
             </p>
             <p>
@@ -109,7 +109,7 @@ export default function Privacy() {
 
           <Section title="Your choices & deletion">
             <p>
-              You can clear all of your anchors and proofs at any time from{" "}
+              You can clear all of your marks and proofs at any time from{" "}
               <strong className="text-foreground">Settings → Data → Clear all data</strong>{" "}
               inside the app. To request full deletion of your account and associated email,
               contact us at{" "}
@@ -125,7 +125,7 @@ export default function Privacy() {
 
           <Section title="Children">
             <p>
-              Anchored is not directed at children under 13, and we do not knowingly collect
+              DoneMark is not directed at children under 13, and we do not knowingly collect
               personal information from them.
             </p>
           </Section>
@@ -133,7 +133,7 @@ export default function Privacy() {
           <Section title="Changes to this policy">
             <p>
               If we make material changes, we'll update the date at the top of this page. Your
-              continued use of Anchored means you accept the updated policy.
+              continued use of DoneMark means you accept the updated policy.
             </p>
           </Section>
 

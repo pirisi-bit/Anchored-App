@@ -31,7 +31,7 @@ export function AnchorReminderSheet({ anchor, open, onClose, onSave }: AnchorRem
   const [minute, setMinute] = useState(existing?.minute ?? 0);
   const [saving, setSaving] = useState(false);
 
-  // Re-initialise when the anchor changes
+  // Re-initialise when the selected mark changes
   function resetToAnchor() {
     const r = anchor?.reminder;
     setEnabled(r?.enabled ?? true);
@@ -92,7 +92,7 @@ export function AnchorReminderSheet({ anchor, open, onClose, onSave }: AnchorRem
         <DrawerHeader className="pb-2">
           <div className="flex items-center justify-between">
             <DrawerTitle className="flex items-center gap-2">
-              <span className="text-xl">{anchor?.emoji ?? "⚓"}</span>
+              <span className="text-xl">{anchor?.emoji ?? "✅"}</span>
               <span>{t.reminder.title}</span>
             </DrawerTitle>
             <DrawerClose asChild>

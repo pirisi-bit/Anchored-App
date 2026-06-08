@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Anchored Mobile",
-    "slug": "mobile",
+    "name": "DoneMark",
+    "slug": "donemark",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobile",
+    "scheme": "donemark",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -15,17 +15,17 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.anchored.mobile",
+      "bundleIdentifier": "com.donemark.app",
       "buildNumber": "1",
       "infoPlist": {
-        "NSCameraUsageDescription": "Anchored uses the camera so you can capture a photo as proof that you completed a daily anchor.",
-        "NSPhotoLibraryUsageDescription": "Anchored needs access to your photos so you can attach an existing image as proof for a daily anchor.",
-        "NSMicrophoneUsageDescription": "Anchored uses the microphone so you can record a short voice note as proof that you completed a daily anchor.",
+        "NSCameraUsageDescription": "DoneMark uses the camera so you can capture a photo as proof that you completed an important action.",
+        "NSPhotoLibraryUsageDescription": "DoneMark needs access to your photos so you can attach an existing image as proof that an important action was completed.",
+        "NSMicrophoneUsageDescription": "DoneMark uses the microphone so you can record a short voice note as proof that an important action was completed.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.anchored.mobile",
+      "package": "com.donemark.app",
       "versionCode": 1,
       "permissions": [
         "android.permission.CAMERA",
@@ -54,14 +54,14 @@
       [
         "expo-image-picker",
         {
-          "cameraPermission": "Anchored uses the camera so you can capture a photo as proof that you completed a daily anchor.",
-          "photosPermission": "Anchored needs access to your photos so you can attach an existing image as proof for a daily anchor."
+          "cameraPermission": "DoneMark uses the camera so you can capture a photo as proof that you completed an important action.",
+          "photosPermission": "DoneMark needs access to your photos so you can attach an existing image as proof that an important action was completed."
         }
       ],
       [
         "expo-audio",
         {
-          "microphonePermission": "Anchored uses the microphone so you can record a short voice note as proof that you completed a daily anchor."
+          "microphonePermission": "DoneMark uses the microphone so you can record a short voice note as proof that an important action was completed."
         }
       ]
     ],

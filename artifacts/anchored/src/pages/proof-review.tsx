@@ -92,7 +92,7 @@ export default function ProofReview() {
       )}
 
       <div className="bg-card rounded-2xl p-5 shadow-sm border mb-6">
-        <DetailRow label="Anchor" value={t.templateNames[anchor.name] ?? anchor.name} />
+        <DetailRow label="Mark" value={t.templateNames[anchor.name] ?? anchor.name} />
         <DetailRow label="Category" value={anchor.category} />
         <DetailRow label="Status" value={<StatusBadge status={proof.status} />} />
         <DetailRow label="Verification Method" value={proof.verificationMethod} />

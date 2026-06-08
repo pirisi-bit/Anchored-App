@@ -21,7 +21,7 @@ export default function ProofPage() {
     <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-36 px-4 pt-8">
       <header className="mb-8">
         <h1 className="text-3xl font-extrabold tracking-tight">Your Proof</h1>
-        <p className="text-muted-foreground mt-1">Timeline of completed anchors.</p>
+        <p className="text-muted-foreground mt-1">Timeline of completed marks.</p>
       </header>
 
       {loading ? (
@@ -34,7 +34,7 @@ export default function ProofPage() {
             <span className="text-4xl text-muted-foreground/30">✓</span>
           </div>
           <p className="font-medium text-lg text-foreground">No proof yet.</p>
-          <p className="max-w-[250px]">Start verifying your anchors on the Dashboard.</p>
+          <p className="max-w-[250px]">Start verifying your marks on the Dashboard.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-8 relative before:absolute before:inset-0 before:ml-2.5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-border">

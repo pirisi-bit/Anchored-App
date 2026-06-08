@@ -78,7 +78,7 @@ export default function AnchorsPage() {
         <p className="text-muted-foreground mt-1">{t.anchorsPage.subtitle}</p>
       </header>
 
-      {/* Create custom anchor shortcut */}
+      {/* Create custom mark shortcut */}
       <button
         onClick={() => setCreateOpen(true)}
         className="flex items-center gap-3 bg-card rounded-2xl p-4 shadow-sm border mb-6 w-full text-left hover:bg-muted/50 transition-colors"
@@ -103,7 +103,7 @@ export default function AnchorsPage() {
           Object.entries(grouped).map(([categoryStr, categoryAnchors]) => {
             const category = categoryStr as Category;
 
-            // Sort: active anchors first, inactive at bottom
+            // Sort: active marks first, inactive at bottom
             const sorted = [...categoryAnchors].sort((a, b) => {
               if (a.active === b.active) return 0;
               return a.active ? -1 : 1;
@@ -119,7 +119,7 @@ export default function AnchorsPage() {
                 </div>
 
                 <div className="bg-card rounded-2xl shadow-sm border overflow-hidden">
-                  {/* Active anchors */}
+                  {/* Active marks */}
                   {activeList.map((anchor, i) => (
                     <AnchorRow
                       key={anchor.id}
@@ -143,7 +143,7 @@ export default function AnchorsPage() {
                     </div>
                   )}
 
-                  {/* Inactive anchors */}
+                  {/* Inactive marks */}
                   {inactiveList.map((anchor, i) => (
                     <AnchorRow
                       key={anchor.id}
@@ -221,7 +221,7 @@ function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, onDelete, t 
           data-testid={`switch-anchor-${anchor.id}`}
         />
 
-        {/* Reminder bell — only on active anchors */}
+        {/* Reminder bell — only on active marks */}
         {anchor.active && (
           <button
             onClick={onReminderClick}
@@ -238,10 +238,10 @@ function AnchorRow({ anchor, showBorder, onToggle, onReminderClick, onDelete, t 
           </button>
         )}
 
-        {/* Delete — visible on hover/focus; always visible on inactive anchors */}
+        {/* Delete — visible on hover/focus; always visible on inactive marks */}
         <button
           onClick={() => onDelete(anchor)}
-          title="Remove anchor"
+          title="Remove mark"
           className={cn(
             "w-8 h-8 rounded-full flex items-center justify-center transition-colors text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10",
             !anchor.active && "text-muted-foreground/60"

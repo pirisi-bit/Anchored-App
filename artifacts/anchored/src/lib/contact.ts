@@ -6,4 +6,4 @@
  * contact, and Apple requires a working account/data-deletion path — requests
  * to this address must be answered.
  */
-export const SUPPORT_EMAIL = "support@anchored.app";
+export const SUPPORT_EMAIL = "support@donemark.app";

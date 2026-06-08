@@ -1,6 +1,6 @@
-# Anchored — Developer Handover Guide
+# DoneMark — Developer Handover Guide
 
-This document is written for a human developer taking over the **Anchored**
+This document is written for a human developer taking over the **DoneMark**
 codebase. It explains what the app does, how it is built, **why** each major
 decision was made, where every important piece of code lives, and how to debug
 the things most likely to break.
@@ -11,9 +11,9 @@ see `replit.md`; for cross-session "gotchas" the previous agents recorded, see
 
 ---
 
-## 1. What Anchored is
+## 1. What DoneMark is
 
-Anchored helps anxious / conscientious people build **trustworthy daily proof**
+DoneMark helps conscientious people build **trustworthy daily proof**
 that important routines were done — locking up, taking medication, paying bills,
 personal care, pet care. The emotional promise is *peace of mind / "everything's
 under control"*, not "remember more".
@@ -240,7 +240,7 @@ src/
                          selfConfirm / addPhotoProof / addReceiptProof, refresh()
     storage.ts           Supabase reads/writes; snake_case↔camelCase mapping;
                          upsertProof on (user_id,anchor_id,date_key); todayKey
-    contact.ts           SUPPORT_EMAIL (currently support@anchored.app — TODO)
+    contact.ts           SUPPORT_EMAIL (currently support@donemark.app — TODO)
     utils.ts             cn() etc.
   components/
     AnchorCard, BottomNav, CategoryAccordion, PhotoSheet, ReceiptSheet,
@@ -299,7 +299,7 @@ components/
 constants/colors.ts  light/dark palette (warm mid-century)
 hooks/useColors.ts   returns palette via useColorScheme() + global tokens
 app.json             STATIC Expo config (scheme "mobile", bundle/package
-                     com.anchored.mobile, camera/photo permission strings,
+                     com.donemark.app, camera/photo permission strings,
                      plugins incl. expo-notifications + expo-image-picker)
 ```
 
@@ -429,7 +429,7 @@ Netlify — static-only hosting would break the upload API.
   `artifacts/mobile/store/` (`store-listing.md`, `screenshots/`,
   `generate-screenshots.mjs`). Public Privacy/Support pages are hosted on the web
   app at `/privacy` and `/support`.
-- **Before submission TODO:** `SUPPORT_EMAIL` (`support@anchored.app`) must
+- **Before submission TODO:** `SUPPORT_EMAIL` (`support@donemark.app`) must
   become a real, monitored inbox — Apple requires deletion requests be honored
   there, and full account deletion is currently a support-email process.
 
@@ -484,7 +484,7 @@ POST resolves and that the returned URL is written to the proof.
 - **Site URL still points at the dev domain** — must be swapped to the published
   web domain after first deploy (Task #15). Until then, web email links only work
   while the workspace is running.
-- **Support email is a placeholder** (`support@anchored.app`) on an unowned
+- **Support email is a placeholder** (`support@donemark.app`) on an unowned
   domain — must become a real monitored inbox before store submission.
 - **Account deletion** in-app only clears anchors/proofs; full account deletion
   is a manual support-email process.

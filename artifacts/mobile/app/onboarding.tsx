@@ -42,7 +42,7 @@ export default function OnboardingScreen() {
   const [saving, setSaving] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
-  // Dedup: names already in the user's anchors (lowercased for comparison)
+  // Dedup: names already in the user's marks (lowercased for comparison)
   const existingNames = new Set(anchors.map((a) => a.name.toLowerCase()));
 
   const toggle = (template: string, category: Category) => {
@@ -185,7 +185,7 @@ export default function OnboardingScreen() {
           })}
         </View>
 
-        {/* Create your own anchor — appears after the template categories */}
+        {/* Create your own mark — appears after the template categories */}
         <Pressable
           onPress={() => setCreateOpen(true)}
           style={({ pressed }) => [

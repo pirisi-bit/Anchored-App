@@ -31,7 +31,7 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-- `artifacts/anchored` — the Anchored web app (React + Vite + wouter).
+- `artifacts/anchored` — the DoneMark web app (React + Vite + wouter).
   - `src/lib/supabase-client.ts` — browser Supabase client (reads `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`).
   - `src/lib/auth-context.tsx` — `AuthProvider` / `useAuth` (email + Google auth, session).
   - `src/lib/anchors-context.tsx` — `AnchorsProvider` / `useAnchors` (async, user-scoped anchors & proofs).
@@ -41,7 +41,7 @@ _Replace the heading above with the project's name, and this line with one sente
   - `src/pages/login.tsx` — auth screen (incl. "Forgot password?"); route protection lives in `src/App.tsx`.
   - `src/pages/reset-password.tsx` — set-new-password screen reached from the recovery email link; waits for the `PASSWORD_RECOVERY` session before showing the form.
   - `supabase/migrations/0001_init.sql` — source-of-truth DB schema + RLS (applied manually in the Supabase dashboard).
-- `artifacts/mobile` — the Anchored native Expo app (mirrors the web design, same Supabase backend; expo-router).
+- `artifacts/mobile` — the DoneMark native Expo app (mirrors the web design, same Supabase backend; expo-router).
   - `app.json` — static Expo config: iOS `bundleIdentifier`/`buildNumber`, Android `package`/`versionCode`, camera + photo-library permission strings (used by `components/CaptureSheet.tsx`). Keep config static here — never add `app.config.ts/js`.
   - `lib/notifications.ts` — expo-notifications handler + daily-reminder scheduling helpers (web-guarded; native only).
   - `lib/reminders-context.tsx` — `RemindersProvider` / `useReminders` (persisted enable + time in AsyncStorage, permission request, reschedules the daily local reminder with today's unverified count).
@@ -59,7 +59,7 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Product
 
-Anchored lets users build trustworthy daily proof that important routines were done (home safety, medication, bills, personal care, pet care). Users sign up (email/password or Google), pick anchors to track, and verify each one daily via self-confirm, photo, or receipt. Proofs form a timeline. All data is private per user.
+DoneMark lets users build trustworthy daily proof that important routines were done (home safety, medication, bills, personal care, pet care). Users sign up (email/password or Google), pick marks to track, and verify each mark daily via self-confirm, photo, or receipt. Proofs form a timeline. All data is private per user.
 
 ## User preferences
 

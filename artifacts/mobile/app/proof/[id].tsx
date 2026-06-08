@@ -121,7 +121,7 @@ export default function ProofReviewScreen() {
         ) : null}
 
         <View style={[styles.detailCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <DetailRow label="Anchor" value={t.templateNames[anchor.name] ?? anchor.name} />
+          <DetailRow label="Mark" value={t.templateNames[anchor.name] ?? anchor.name} />
           <DetailRow label="Category" value={anchor.category} />
           <DetailRow label="Status" value={<StatusBadge status={proof.status} />} />
           <DetailRow label="Method" value={proof.verificationMethod} />

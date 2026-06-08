@@ -84,7 +84,7 @@ export default function AnchorsScreen() {
 
   const handleDelete = (anchor: Anchor) => {
     Alert.alert(
-      "Remove anchor",
+      "Remove mark",
       `Remove "${t.templateNames[anchor.name] ?? anchor.name}"? This cannot be undone.`,
       [
         { text: "Cancel", style: "cancel" },
@@ -118,7 +118,7 @@ export default function AnchorsScreen() {
           </Text>
         </View>
 
-        {/* Create custom anchor shortcut */}
+        {/* Create custom mark shortcut */}
         <Pressable
           onPress={() => setCreateOpen(true)}
           style={({ pressed }) => [
@@ -174,7 +174,7 @@ export default function AnchorsScreen() {
                       { backgroundColor: colors.card, borderColor: colors.border },
                     ]}
                   >
-                    {/* Active anchors */}
+                    {/* Active marks */}
                     {activeList.map((anchor, i) => (
                       <View
                         key={anchor.id}
@@ -229,7 +229,7 @@ export default function AnchorsScreen() {
                       </View>
                     )}
 
-                    {/* Inactive anchors */}
+                    {/* Inactive marks */}
                     {inactiveList.map((anchor, i) => (
                       <View
                         key={anchor.id}

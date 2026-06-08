@@ -145,7 +145,7 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        {/* Anchors */}
+        {/* Marks */}
         <section className="flex flex-col gap-2">
           <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider px-2">
             {t.settings.anchorsSection}
@@ -180,7 +180,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <span className="font-bold block">{t.tutorial.triggerBtn}</span>
-                <span className="text-xs text-muted-foreground">5-step intro to Anchored</span>
+                <span className="text-xs text-muted-foreground">5-step intro to DoneMark</span>
               </div>
             </div>
             <HelpCircle className="w-5 h-5 text-muted-foreground" />

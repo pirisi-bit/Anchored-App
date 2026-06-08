@@ -1,5 +1,5 @@
 /**
- * Semantic design tokens for the Anchored mobile app.
+ * Semantic design tokens for the DoneMark mobile app.
  *
  * These mirror the sibling web artifact (artifacts/anchored/src/index.css)
  * so both apps share the same warm mid-century visual identity.

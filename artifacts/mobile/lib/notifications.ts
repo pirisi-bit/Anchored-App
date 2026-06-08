@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 
-export const REMINDER_IDENTIFIER = "anchored-daily-reminder";
+export const REMINDER_IDENTIFIER = "donemark-daily-reminder";
 export const REMINDER_NOTIFICATION_TYPE = "daily-reminder";
 
 export function isDailyReminderResponse(
@@ -62,7 +62,7 @@ export async function scheduleDailyReminder(
   await Notifications.scheduleNotificationAsync({
     identifier: REMINDER_IDENTIFIER,
     content: {
-      title: "Time to anchor your day",
+      title: "Time to mark what's done",
       body,
       data: {
         type: REMINDER_NOTIFICATION_TYPE,
