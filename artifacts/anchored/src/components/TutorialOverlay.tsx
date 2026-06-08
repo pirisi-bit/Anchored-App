@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { BrandMark } from "@/components/BrandMark";
 import { useT } from "@/lib/lang-context";
 
 interface TutorialOverlayProps {
@@ -69,14 +70,18 @@ export function TutorialOverlay({ open, onClose }: TutorialOverlayProps) {
             <div className={`bg-gradient-to-br ${colors.bg} px-8 pt-10 pb-8 flex flex-col items-center gap-3`}>
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={`emoji-${step}`}
+                  key={`visual-${step}`}
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.5, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                  className="text-7xl select-none"
+                  className={step === 0 ? "select-none" : "text-7xl select-none"}
                 >
-                  {steps[step].emoji}
+                  {step === 0 ? (
+                    <BrandMark className="h-20 w-20 shadow-lg" />
+                  ) : (
+                    steps[step].emoji
+                  )}
                 </motion.div>
               </AnimatePresence>
 
