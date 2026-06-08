@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Camera, Image as ImageIcon, X, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { apiPath } from "@/lib/api";
 
 interface PhotoSheetProps {
   open: boolean;
@@ -62,7 +63,7 @@ export function PhotoSheet({ open, onOpenChange, onSave, anchorName }: PhotoShee
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("/api/receipts/upload", {
+      const res = await fetch(apiPath("/api/receipts/upload"), {
         method: "POST",
         body: formData,
       });
