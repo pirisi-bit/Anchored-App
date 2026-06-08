@@ -1,5 +1,6 @@
 import { Link } from "wouter";
-import { Fingerprint, Shield, FileText, Lock } from "lucide-react";
+import { Shield, FileText, Lock } from "lucide-react";
+import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -8,7 +9,7 @@ export default function Home() {
       {/* 1. Nav/Header */}
       <header className="w-full px-6 py-4 flex items-center justify-between z-10 relative max-w-7xl mx-auto">
         <div className="flex items-center gap-2 text-foreground" data-testid="link-home">
-          <Fingerprint className="w-6 h-6 text-primary" strokeWidth={2.5} />
+          <BrandMark className="h-8 w-8" />
           <span className="font-bold text-lg tracking-tight">DoneMark</span>
         </div>
       </header>

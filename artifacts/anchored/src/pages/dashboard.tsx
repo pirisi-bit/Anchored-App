@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Loader2, X } from "lucide-react";
 import { Anchor } from "@/lib/storage";
 import { cn } from "@/lib/utils";
+import { BrandMark } from "@/components/BrandMark";
 
 type Filter = "all" | "verified" | "pending";
 
@@ -107,9 +108,12 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-[100dvh] flex flex-col max-w-md mx-auto pb-36 px-4 pt-8">
-      <header className="mb-6">
-        <h2 className="text-muted-foreground font-medium mb-1 text-sm">{format(new Date(), "EEEE, MMMM d")}</h2>
-        <h1 className="text-3xl font-extrabold tracking-tight">{t.dashboard.title}</h1>
+      <header className="mb-6 flex items-center gap-3">
+        <BrandMark className="h-12 w-12 shrink-0" />
+        <div>
+          <h2 className="text-muted-foreground font-medium mb-1 text-sm">{format(new Date(), "EEEE, MMMM d")}</h2>
+          <h1 className="text-3xl font-extrabold tracking-tight">{t.dashboard.title}</h1>
+        </div>
       </header>
 
       {/* Progress card */}
