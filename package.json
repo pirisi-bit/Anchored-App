@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "dev:web": "pnpm --filter @workspace/anchored run dev",
+    "dev:api": "set -a; [ ! -f artifacts/api-server/.env.local ] || . artifacts/api-server/.env.local; set +a; pnpm --filter @workspace/api-server run dev",
+    "dev:mobile": "pnpm --filter @workspace/mobile run dev:local",
     "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
     "typecheck:libs": "tsc --build",
