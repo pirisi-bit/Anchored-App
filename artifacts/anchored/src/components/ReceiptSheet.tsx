@@ -3,6 +3,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@
 import { Button } from "@/components/ui/button";
 import { FileText, Image as ImageIcon, X, Loader2, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
+import { apiPath } from "@/lib/api";
 
 interface ReceiptSheetProps {
   open: boolean;
@@ -71,7 +72,7 @@ export function ReceiptSheet({ open, onOpenChange, onSave, anchorName }: Receipt
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("/api/receipts/upload", {
+      const res = await fetch(apiPath("/api/receipts/upload"), {
         method: "POST",
         body: formData,
       });

@@ -1,5 +1,21 @@
 const MAX_BYTES = 10 * 1024 * 1024;
 
+function uploadApiOrigin(): string {
+  const domain = process.env.EXPO_PUBLIC_DOMAIN;
+  if (!domain) {
+    throw new Error("Upload domain is not configured.");
+  }
+
+  if (domain.startsWith("http://") || domain.startsWith("https://")) {
+    return domain.replace(/\/$/, "");
+  }
+
+  const protocol = domain.startsWith("localhost") || domain.startsWith("127.0.0.1")
+    ? "http"
+    : "https";
+  return `${protocol}://${domain}`;
+}
+
 export interface PickedFile {
   uri: string;
   name: string;
@@ -17,11 +33,6 @@ export async function uploadProofFile(file: PickedFile): Promise<string> {
     throw new Error("File is too large. Max size is 10MB.");
   }
 
-  const domain = process.env.EXPO_PUBLIC_DOMAIN;
-  if (!domain) {
-    throw new Error("Upload domain is not configured.");
-  }
-
   const formData = new FormData();
   formData.append("file", {
     uri: file.uri,
@@ -29,7 +40,7 @@ export async function uploadProofFile(file: PickedFile): Promise<string> {
     type: file.type,
   } as unknown as Blob);
 
-  const res = await fetch(`https://${domain}/api/receipts/upload`, {
+  const res = await fetch(`${uploadApiOrigin()}/api/receipts/upload`, {
     method: "POST",
     body: formData,
   });

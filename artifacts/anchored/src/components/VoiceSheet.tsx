@@ -3,6 +3,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@
 import { Button } from "@/components/ui/button";
 import { Mic, Square, X, Loader2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { apiPath } from "@/lib/api";
 import { useT } from "@/lib/lang-context";
 import { cn } from "@/lib/utils";
 
@@ -145,7 +146,7 @@ export function VoiceSheet({ open, onOpenChange, onSave, anchorName }: VoiceShee
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("/api/receipts/upload", { method: "POST", body: formData });
+      const res = await fetch(apiPath("/api/receipts/upload"), { method: "POST", body: formData });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || "Upload failed");
