@@ -4,6 +4,15 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Run & Operate
 
+- Local setup:
+  - Install Node.js 24 and pnpm.
+  - Run `pnpm install` from the repo root.
+  - Copy each package env template you need, e.g. `cp artifacts/anchored/.env.example artifacts/anchored/.env.local`.
+  - For uploads/API, copy `artifacts/api-server/.env.example` to `artifacts/api-server/.env.local` and replace `SUPABASE_SERVICE_ROLE_KEY` with the service-role key from Supabase. Do not commit real `.env*` files.
+- Local dev:
+  - `pnpm run dev:web` — run the web app on port 3000.
+  - `pnpm run dev:api` — run the upload API on port 5000.
+  - `pnpm run dev:mobile` — run Expo locally.
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
