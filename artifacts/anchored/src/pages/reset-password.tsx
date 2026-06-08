@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Anchor, Loader2 } from "lucide-react";
+import { Fingerprint, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase-client";
 import { Button } from "@/components/ui/button";
@@ -69,7 +69,7 @@ export default function ResetPassword() {
     <div className="min-h-[100dvh] flex flex-col items-center justify-center max-w-md mx-auto px-6 py-12">
       <div className="flex flex-col items-center mb-8">
         <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center mb-4">
-          <Anchor className="w-8 h-8 text-primary" strokeWidth={2.5} />
+          <Fingerprint className="w-8 h-8 text-primary" strokeWidth={2.5} />
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight">Set a new password</h1>
         <p className="text-muted-foreground mt-1 text-center">

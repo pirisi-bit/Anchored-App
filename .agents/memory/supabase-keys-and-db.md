@@ -17,7 +17,7 @@ the frontend.
 agent. RLS — not key secrecy — is what protects user data with the publishable key.
 
 ## Web and mobile share ONE Supabase project
-The Anchored web (Vite) and mobile (Expo) artifacts talk to the **same** Supabase
+The DoneMark web (Vite) and mobile (Expo) artifacts talk to the **same** Supabase
 project. The only difference is the env-var prefix the bundler exposes: web reads
 `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`; mobile reads
 `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY`. Same publishable key,

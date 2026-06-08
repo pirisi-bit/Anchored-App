@@ -16,9 +16,9 @@ import {
   cancelDailyReminder,
 } from "./notifications";
 
-const ENABLED_KEY = "anchored.reminders.enabled";
-const HOUR_KEY = "anchored.reminders.hour";
-const MINUTE_KEY = "anchored.reminders.minute";
+const ENABLED_KEY = "donemark.reminders.enabled";
+const HOUR_KEY = "donemark.reminders.hour";
+const MINUTE_KEY = "donemark.reminders.minute";
 
 const DEFAULT_HOUR = 20;
 const DEFAULT_MINUTE = 0;
@@ -40,7 +40,7 @@ const RemindersContext = createContext<RemindersContextType | undefined>(
 
 function buildBody(remaining: number): string {
   if (remaining <= 0) {
-    return "You're all caught up — open Anchored to keep your proof going.";
+    return "You're all caught up — open DoneMark to keep your proof going.";
   }
   if (remaining === 1) {
     return "You have 1 routine left to verify today.";

@@ -86,9 +86,9 @@ export default function LoginScreen() {
       >
         <View style={styles.brand}>
           <View style={[styles.logo, { backgroundColor: colors.primary }]}>
-            <Feather name="anchor" size={28} color={colors.primaryForeground} />
+            <Feather name="check-circle" size={28} color={colors.primaryForeground} />
           </View>
-          <Text style={[styles.appName, { color: colors.foreground }]}>Anchored</Text>
+          <Text style={[styles.appName, { color: colors.foreground }]}>DoneMark</Text>
           <Text style={[styles.tagline, { color: colors.mutedForeground }]}>
             Daily proof your routines were done.
           </Text>
@@ -179,7 +179,7 @@ export default function LoginScreen() {
 
           <View style={styles.switchRow}>
             <Text style={[styles.switchText, { color: colors.mutedForeground }]}>
-              {mode === "signin" ? "New to Anchored?" : "Already have an account?"}
+              {mode === "signin" ? "New to DoneMark?" : "Already have an account?"}
             </Text>
             <Pressable
               onPress={() => setMode(mode === "signin" ? "signup" : "signin")}

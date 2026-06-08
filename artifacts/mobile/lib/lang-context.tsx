@@ -9,7 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { en, type Translations } from "./i18n/en";
 import { es } from "./i18n/es";
 
-const STORAGE_KEY = "anchored-lang";
+const STORAGE_KEY = "donemark-lang";
 
 export type Lang = "en" | "es";
 

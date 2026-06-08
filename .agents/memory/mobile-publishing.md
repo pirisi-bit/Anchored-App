@@ -1,9 +1,9 @@
 ---
-name: Mobile publishing path (Anchored)
-description: How the Anchored Expo app gets to the stores on Replit — and why EAS is off-limits.
+name: Mobile publishing path (DoneMark)
+description: How the DoneMark Expo app gets to the stores on Replit — and why EAS is off-limits.
 ---
 
-# Publishing the Anchored mobile app
+# Publishing the DoneMark mobile app
 
 **Rule:** Do NOT create `eas.json` or run/suggest any EAS CLI command
 (`eas build`, `eas submit`, `eas init`, `eas update`, etc.). iOS publishing is

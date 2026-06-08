@@ -33,11 +33,11 @@ not a code bug** — nothing in this repo needs to change.
 Do this at a computer, signed into the Google account that should own the app.
 
 1. Go to **https://console.cloud.google.com/**.
-2. Top bar → project picker → **New Project** (e.g. name it `Anchored`), then
+2. Top bar → project picker → **New Project** (e.g. name it `DoneMark`), then
    select it. (Or reuse an existing project you control.)
 3. Left menu → **APIs & Services → OAuth consent screen**:
    - User type **External** → Create.
-   - Fill **App name** (`Anchored`), **User support email**, and a **Developer
+   - Fill **App name** (`DoneMark`), **User support email**, and a **Developer
      contact email**. Save and continue through the steps.
    - While the app is in **Testing**, only **test users** you list can sign in.
      Either add your Google address under **Test users**, or **Publish app** to
@@ -46,7 +46,7 @@ Do this at a computer, signed into the Google account that should own the app.
 4. Left menu → **APIs & Services → Credentials → Create Credentials → OAuth
    client ID**:
    - **Application type:** **Web application**.
-   - **Name:** anything, e.g. `Anchored Supabase`.
+   - **Name:** anything, e.g. `DoneMark Supabase`.
    - **Authorized redirect URIs → Add URI:**
      `https://zpjxbhbpnflynwhvsnmu.supabase.co/auth/v1/callback`
      (exact, no trailing slash — this is the single most common mistake.)

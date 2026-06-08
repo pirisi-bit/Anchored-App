@@ -94,7 +94,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="circle.grid.2x2" tintColor={color} size={24} />
             ) : (
-              <Feather name="anchor" size={22} color={color} />
+              <Feather name="check-square" size={22} color={color} />
             ),
         }}
       />

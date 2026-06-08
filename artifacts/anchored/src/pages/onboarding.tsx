@@ -37,7 +37,7 @@ export default function Onboarding() {
   const [saving, setSaving] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
-  // Build the set of already-saved anchor names for dedup check.
+  // Build the set of already-saved mark names for dedup check.
   const existingNames = new Set(anchors.map((a) => a.name.toLowerCase()));
 
   const getTemplates = (category: Category) =>
@@ -75,7 +75,7 @@ export default function Onboarding() {
       await addAnchors(newAnchors);
       setLocation("/dashboard");
     } catch (e) {
-      console.error("Failed to save anchors:", e);
+      console.error("Failed to save marks:", e);
       toast.error(t.errors.couldNotSave);
       setSaving(false);
     }
@@ -118,7 +118,7 @@ export default function Onboarding() {
           />
         ))}
 
-        {/* Create your own anchor */}
+        {/* Create your own mark */}
         <button
           type="button"
           onClick={() => setCreateOpen(true)}

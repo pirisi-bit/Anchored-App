@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Anchor, ArrowLeft, Mail } from "lucide-react";
+import { Fingerprint, ArrowLeft, Mail } from "lucide-react";
 import { SUPPORT_EMAIL } from "@/lib/contact";
 
 function Faq({ q, children }: { q: string; children: React.ReactNode }) {
@@ -20,8 +20,8 @@ export default function Support() {
           className="flex items-center gap-2 text-foreground"
           data-testid="link-home"
         >
-          <Anchor className="w-6 h-6 text-primary" strokeWidth={2.5} />
-          <span className="font-bold text-lg tracking-tight">Anchored</span>
+          <Fingerprint className="w-6 h-6 text-primary" strokeWidth={2.5} />
+          <span className="font-bold text-lg tracking-tight">DoneMark</span>
         </Link>
         <Link
           href="/"
@@ -35,7 +35,7 @@ export default function Support() {
       <main className="max-w-3xl mx-auto px-6 pb-24 pt-6">
         <h1 className="text-4xl font-extrabold tracking-tight mb-2">Support</h1>
         <p className="text-muted-foreground mb-10 leading-relaxed">
-          We're here to help you stay anchored. Most questions are answered below — if you
+          We're here to help you keep proof of what matters. Most questions are answered below — if you
           need anything else, just email us.
         </p>
 
@@ -53,25 +53,25 @@ export default function Support() {
         </a>
 
         <div className="space-y-4">
-          <Faq q="What is Anchored?">
+          <Faq q="What is DoneMark?">
             <p>
-              Anchored helps you build trustworthy, dated proof that your important daily
+              DoneMark helps you build trustworthy, dated proof that your important daily
               routines — locking the door, taking medication, paying a bill, pet care — were
               actually done, so you can stop second-guessing yourself.
             </p>
           </Faq>
 
-          <Faq q="How do I verify an anchor?">
+          <Faq q="How do I verify a mark?">
             <p>
-              Open Today and tap an anchor. You can self-confirm with a tap, snap a photo, or
+              Open Today and tap a mark. You can self-confirm with a tap, snap a photo, or
               attach a receipt. Each confirmation is saved with the date to your private
               timeline.
             </p>
           </Faq>
 
-          <Faq q="Why does Anchored ask for camera and photo access?">
+          <Faq q="Why does DoneMark ask for camera and photo access?">
             <p>
-              Only so you can capture a photo or attach a receipt as proof. Anchored accesses
+              Only so you can capture a photo or attach a receipt as proof. DoneMark accesses
               the camera or your photos only when you choose to add proof — never in the
               background.
             </p>
@@ -79,7 +79,7 @@ export default function Support() {
 
           <Faq q="How do I set a daily reminder?">
             <p>
-              Go to Settings and turn on the daily reminder, then pick a time. Anchored sends
+              Go to Settings and turn on the daily reminder, then pick a time. DoneMark sends
               one gentle nudge about anything you haven't confirmed yet.
             </p>
           </Faq>
@@ -100,7 +100,7 @@ export default function Support() {
 
           <Faq q="How do I delete my data or account?">
             <p>
-              To clear your anchors and proofs, open{" "}
+              To clear your marks and proofs, open{" "}
               <strong className="text-foreground">Settings → Data → Clear all data</strong> in
               the app. To delete your entire account and email, email us at{" "}
               <a
@@ -122,7 +122,7 @@ export default function Support() {
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-sm font-medium text-muted-foreground">Anchored v1.0</p>
+          <p className="text-sm font-medium text-muted-foreground">DoneMark v1.0</p>
         </div>
       </main>
     </div>
